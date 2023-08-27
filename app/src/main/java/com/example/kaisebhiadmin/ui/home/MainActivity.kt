@@ -18,9 +18,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
         viewModel = ViewModelProvider(this@MainActivity,
-            MainViewModelFactory(this@MainActivity, MainRepository())).get(MainViewModel::class.java)
+            MainViewModelFactory(this@MainActivity, MainRepository()))[MainViewModel::class.java]
         binding.viewModel = viewModel
-
         viewModel.liveData.observe(this@MainActivity, Observer {
             Toast.makeText(this, "$it", Toast.LENGTH_SHORT).show()
         })
