@@ -5,12 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kaisebhiadmin.data.MainRepository
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val context: Context,
     private val repo: MainRepository): ViewModel() {
     //LiveData which stores all the data of View(MainActivity)
-    val liveData: MutableLiveData<String> = MutableLiveData()
+    val liveData: MutableLiveData<ArrayList<DocumentSnapshot>> = MutableLiveData()
 
     //test method
     fun getQues() {
