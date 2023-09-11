@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
     val quesLiveData = MutableLiveData<ResponseClass>()
     val adminLiveData = MutableLiveData<ResponseClass>()
+
     /**Below method get all questions */
     suspend fun getAllQuestions() {
         firebaseInterface.getQuesApi()
