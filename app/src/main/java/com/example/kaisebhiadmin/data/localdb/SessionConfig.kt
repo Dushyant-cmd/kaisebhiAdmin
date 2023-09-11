@@ -18,4 +18,10 @@ class SessionConfig(private val ctx: Context) {
         editor.putBoolean("loginStatus", status)
         editor.apply()
     }
+
+    fun clear() {
+        val editor = sharedPref.edit()
+        editor.clear()
+        editor.apply()
+    }
 }

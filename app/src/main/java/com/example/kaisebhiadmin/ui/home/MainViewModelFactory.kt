@@ -12,6 +12,6 @@ class MainViewModelFactory(private val context: Context, repo: MainRepository):
         this.repo = repo
     }
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(context, repo) as T
+        return MainViewModel(repo) as T
     }
 }

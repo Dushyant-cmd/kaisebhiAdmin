@@ -23,6 +23,6 @@ class AppCustom: Application() {
         sessionConfig = SessionConfig(applicationContext)
         firestore = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
-        firebaseApiClass = FirebaseApiCalls(this@AppCustom as AppCustom)
+        firebaseApiClass = FirebaseApiCalls(this@AppCustom)
     }
 }
