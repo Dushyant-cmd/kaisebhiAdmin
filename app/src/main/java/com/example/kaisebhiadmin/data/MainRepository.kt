@@ -1,27 +1,42 @@
 package com.example.kaisebhiadmin.data
 
-import android.app.Activity
-import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.example.kaisebhiadmin.data.network.FirebaseApiCalls
 import com.example.kaisebhiadmin.utils.ResponseClass
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
-    val quesLiveData = MutableLiveData<ResponseClass>()
-    val adminLiveData = MutableLiveData<ResponseClass>()
+    val pendingQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
+    val failQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
+    val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
+    val adminLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
+    val updateLivedata = MutableLiveData<ResponseClass>()
 
-    /**Below method get all questions */
-    suspend fun getAllQuestions() {
-        firebaseInterface.getQuesApi()
+    /**Below method get pending questions */
+    suspend fun getPendingQues(filterBy: String, limit: Long) {
+        firebaseInterface.getQuesApi(filterBy, limit)
         withContext(Dispatchers.Main) {
-            firebaseInterface.quesLiveData.observeForever {
-                quesLiveData.value = it
+            firebaseInterface.pendingQuesLiveData.observeForever {
+                pendingQuesLiveData.value = it
+            }
+        }
+    }
+    /**Below method get fail questions */
+    suspend fun getFailQues(filterBy: String, limit: Long) {
+        firebaseInterface.getQuesApi(filterBy, limit)
+        withContext(Dispatchers.Main) {
+            firebaseInterface.failQuesLiveData.observeForever {
+                failQuesLiveData.value = it
+            }
+        }
+    }
+    /**Below method get pass questions */
+    suspend fun getPassQues(filterBy: String, limit: Long) {
+        firebaseInterface.getQuesApi(filterBy, limit)
+        withContext(Dispatchers.Main) {
+            firebaseInterface.passQuesLiveData.observeForever {
+                passQuesLiveData.value = it
             }
         }
     }
@@ -32,6 +47,16 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
         withContext(Dispatchers.Main) {
             firebaseInterface.adminLiveData.observeForever{
                 adminLiveData.value = it
+            }
+        }
+    }
+
+    /**Below method will update status of question */
+    suspend fun updateQues(docId: String, status: String) {
+        firebaseInterface.updateStatus(docId, status)
+        withContext(Dispatchers.Main) {
+            firebaseInterface.updateLiveData.observeForever {
+                updateLivedata.value = it
             }
         }
     }

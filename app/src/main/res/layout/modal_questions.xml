@@ -1,0 +1,156 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/openQues"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="#fff"
+    app:cardCornerRadius="2.5dp"
+    app:cardElevation="1dp"
+    app:contentPaddingBottom="10dp"
+    app:contentPaddingRight="5dp"
+    app:contentPaddingTop="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/userPro"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginVertical="7dp"
+                android:layout_marginRight="5dp"
+                android:paddingRight="10dp"
+                android:src="@drawable/profile" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/quesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="What Happend in July revolution?"
+                android:textColor="#222"
+                android:textSize="16dp" />
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/quesDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:lineSpacingExtra="5dp"
+            android:text="You will receive am your subscription! subscription! You will receive an email to confim your subscription!"
+            android:textColor="#717171"
+            android:textSize="14dp" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Portal: "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/portalTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Amazon"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/quesImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/search_bg"
+            android:padding="5dp"
+            android:textColor="#999"
+            android:textSize="12dp"
+            android:visibility="gone" />
+
+        <!--        <com.google.android.exoplayer2.ui.SimpleExoPlayerView-->
+        <!--            android:id="@+id/exoPlayer"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:layout_marginHorizontal="10dp"-->
+        <!--            app:show_timeout="0"-->
+        <!--            android:layout_marginVertical="5dp"-->
+        <!--            android:background="@android:color/transparent" />-->
+
+        <Button
+            android:id="@+id/playBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#F8A991"
+            android:layout_marginVertical="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:text="Play Audio" />
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="By Garima Jain"
+            android:textColor="#555"
+            android:textSize="10dp"
+            android:textStyle="italic|bold" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/failBtn"
+                android:backgroundTint="@android:color/holo_red_light"
+                android:text="QC Fail"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/passBtn"
+                android:text="QC Pass"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

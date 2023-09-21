@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.kaisebhiadmin.data.MainRepository
 
-class MainViewModelFactory(private val context: Context, repo: MainRepository):
+class MainViewModelFactory(repo: MainRepository):
     ViewModelProvider.Factory {
     private var repo: MainRepository
     init {
