@@ -26,52 +26,55 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
             updateLiveData.value = it
         }
     }
+
     //test method
     fun getPendingQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getPendingQues(filterBy, limit)
         }
-
         repo.pendingQuesLiveData.observeForever {
-                if(it is Success<*>) {
-                    val formattedList: ArrayList<QuestionsModel> =
-                        ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
-                            .map { d: DocumentSnapshot ->
-                                QuestionsModel(
-                                    d.getString("id"),
-                                    d.getString("title"),
-                                    d.getString("desc"),
-                                    d.getString("qpic"),
-                                    d.getString("uname"),
-                                    "NA",
-                                    d.getBoolean("checkFav"),
-                                    d.getString("likes"),
-                                    d.getBoolean("checkLike"),
-                                    d.getString("tanswers"),
-                                    d.getString("likedByUser"),
-                                    d.getString("image"),
-                                    d.getString("userId"),
-                                    d.getString("userPicUrl"),
-                                    d.getString("imageRef"),
-                                    d.getString("portal"),
-                                    d.getString("audio"),
-                                    d.getString("audioRef"),
-                                    d.getString("qualityCheck"))
-                            } as ArrayList<QuestionsModel>
-                    pendingQuesLiveData.value = Success(formattedList)
-                    Log.d("ViewModel.kt", "getPending: $formattedList")
-                } else {
-                    pendingQuesLiveData.value = it
-                }
+            if (it is Success<*>) {
+                val formattedList: ArrayList<QuestionsModel> =
+                    ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
+                        .map { d: DocumentSnapshot ->
+                            QuestionsModel(
+                                d.getString("id"),
+                                d.getString("title"),
+                                d.getString("desc"),
+                                d.getString("qpic"),
+                                d.getString("uname"),
+                                "NA",
+                                d.getBoolean("checkFav"),
+                                d.getString("likes"),
+                                d.getBoolean("checkLike"),
+                                d.getString("tanswers"),
+                                d.getString("likedByUser"),
+                                d.getString("image") ?: "",
+                                d.getString("imageRef"),
+                                d.getString("userId"),
+                                d.getString("userPicUrl"),
+                                d.getString("portal"),
+                                d.getString("audio"),
+                                d.getString("audioRef"),
+                                d.getString("quesImgPath") ?: "NA",
+                                d.getString("qualityCheck")
+                            )
+                        } as ArrayList<QuestionsModel>
+                pendingQuesLiveData.value = Success(formattedList)
+                Log.d("ViewModel.kt", "getPending: $formattedList")
+            } else {
+                pendingQuesLiveData.value = it
+            }
         }
     }
+
     fun getFailQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getFailQues(filterBy, limit)
         }
 
         repo.failQuesLiveData.observeForever {
-            if(it is Success<*>) {
+            if (it is Success<*>) {
                 val formattedList: ArrayList<QuestionsModel> =
                     ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
                         .map { d: DocumentSnapshot ->
@@ -94,7 +97,8 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
                                 d.getString("portal"),
                                 d.getString("audio"),
                                 d.getString("audioRef"),
-                                d.getString("qualityCheck"))
+                                d.getString("qualityCheck")
+                            )
                         } as ArrayList<QuestionsModel>
                 failQuesLiveData.value = Success(formattedList)
                 Log.d("ViewModel.kt", "getFail: $formattedList")
@@ -103,13 +107,14 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
             }
         }
     }
+
     fun getPassQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getPassQues(filterBy, limit)
         }
 
         repo.passQuesLiveData.observeForever {
-            if(it is Success<*>) {
+            if (it is Success<*>) {
                 val formattedList: ArrayList<QuestionsModel> =
                     ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
                         .map { d: DocumentSnapshot ->
@@ -132,7 +137,8 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
                                 d.getString("portal"),
                                 d.getString("audio"),
                                 d.getString("audioRef"),
-                                d.getString("qualityCheck"))
+                                d.getString("qualityCheck")
+                            )
                         } as ArrayList<QuestionsModel>
                 passQuesLiveData.value = Success(formattedList)
                 Log.d("ViewModel.kt", "getPass: $formattedList")

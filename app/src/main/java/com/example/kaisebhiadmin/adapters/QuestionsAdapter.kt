@@ -1,6 +1,7 @@
 package com.example.kaisebhiadmin.adapters
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,18 +15,19 @@ import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.kaisebhiadmin.R
 import com.example.kaisebhiadmin.models.QuestionsModel
 import com.example.kaisebhiadmin.ui.home.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.squareup.picasso.Picasso
 
 class QuestionsAdapter(
     private val list: ArrayList<QuestionsModel>,
     private val ctx: Context,
     private val viewModel: MainViewModel,
     private val fm: FragmentManager
-): ListAdapter<QuestionsModel, QuestionsAdapter.ViewHolder>(object: DiffUtil.ItemCallback<QuestionsModel>() {
+) : ListAdapter<QuestionsModel, QuestionsAdapter.ViewHolder>(object :
+    DiffUtil.ItemCallback<QuestionsModel>() {
     override fun areContentsTheSame(oldItem: QuestionsModel, newItem: QuestionsModel): Boolean {
         return oldItem == newItem
     }
@@ -38,8 +40,11 @@ class QuestionsAdapter(
     override fun getItemCount(): Int {
         return list.size
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.modal_questions, parent, false))
+        return ViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.modal_questions, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -49,14 +54,16 @@ class QuestionsAdapter(
             holder.userName.text = dataObj.uname
             holder.desc.text = dataObj.desc
             holder.title.text = dataObj.title
-            Glide.with(ctx).load(dataObj.image).into(holder.quesImg)
-            Glide.with(ctx).load(dataObj.userPicUrl).placeholder(R.drawable.profile).into(holder.userImage)
+            Log.d(TAG, "onBindViewHolder: ${dataObj.image}")
+            val picasso = Picasso.get()
+            picasso.load(Uri.parse(dataObj.image)).into(holder.quesImg)
+            picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile).into(holder.userImage)
 
-            Log.d(TAG, "onBindViewHolder: ${dataObj.qualityCheck}")
-            if(dataObj.qualityCheck == "fail") {
+            Log.d(TAG, "onBindViewHolder asdasdf: ${dataObj.qualityCheck}")
+            if (dataObj.qualityCheck == "fail") {
                 holder.failBtn.visibility = View.GONE
                 holder.passBtn.visibility = View.VISIBLE
-            } else if(dataObj.qualityCheck == "pass") {
+            } else if (dataObj.qualityCheck == "pass") {
                 holder.passBtn.visibility == View.GONE
                 holder.failBtn.visibility = View.VISIBLE
             } else {
@@ -85,8 +92,8 @@ class QuestionsAdapter(
         private lateinit var exoPlayer: SimpleExoPlayer
         private val TAG = "PlayerBottomSheet.java"
         override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            saveInstanceState: Bundle?): View? {
+            inflater: LayoutInflater, container: ViewGroup?, saveInstanceState: Bundle?
+        ): View? {
             val view = inflater.inflate(R.layout.bottom_sheet_layout, container, false)
 //            setupAudio(view.findViewById(), downloadUrl)
             return view
@@ -109,7 +116,8 @@ class QuestionsAdapter(
             Log.d(TAG, "onDestroy: sheet destroyed")
         }
     }
-    class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val userImage = view.findViewById<ImageView>(R.id.userPro)
         val title = view.findViewById<TextView>(R.id.quesTitle)
         val desc = view.findViewById<TextView>(R.id.quesDesc)
