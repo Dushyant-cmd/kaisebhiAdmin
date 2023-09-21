@@ -17,13 +17,18 @@ import com.example.kaisebhiadmin.utils.AppCustom
 import com.example.kaisebhiadmin.utils.ResponseError
 import com.example.kaisebhiadmin.utils.Success
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class SignInActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignInBinding
     private lateinit var viewModel: SignInViewMode
     private lateinit var email: String
     private lateinit var pass: String
+    private lateinit var fcm: FirebaseMessaging
+    private lateinit var existingTokens: String
     private val TAG = "SignInActivity.kt"
+    private lateinit var currToken: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_in)
@@ -31,6 +36,10 @@ class SignInActivity : AppCompatActivity() {
             this,
             MainSignViewModelFactory(MainRepository((application as AppCustom).firebaseApiClass))
         )[SignInViewMode::class.java]
+        fcm = FirebaseMessaging.getInstance()
+        fcm.token.addOnSuccessListener {
+            currToken = it
+        }
         viewModel.getAdminCred()
         setObservers()
         setListeners()
@@ -69,6 +78,16 @@ class SignInActivity : AppCompatActivity() {
                 success.response?.let {
                     email = success.response.getString("email") as String
                     pass = success.response.getString("password") as String
+                    existingTokens = success.response.getString("adminFcmTokens") as String
+
+                    if(currToken.length > 2) {
+                        val map = mapOf("adminFcmTokens" to "$existingTokens,$currToken")
+                        FirebaseFirestore.getInstance().collection("appData")
+                            .document("admin").update(map)
+                            .addOnCompleteListener {
+                                Log.d(TAG, "setObservers: ${it.result}")
+                            }
+                    }
                 }
                 Log.d(TAG, "setObservers: ${it.response}")
                 Toast.makeText(this, "$it", Toast.LENGTH_SHORT).show()

@@ -81,4 +81,6 @@ dependencies {
 //    implementation("com.google.android.exoplayer:exoplayer-ui:r2.4.0")
     //glide
     implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
+
 }

@@ -48,18 +48,22 @@ class QuestionsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        try {
+//        try {
+        if (currentList.isNotEmpty()) {
             val dataObj = getItem(position)
-            Log.d(TAG, "onBindViewHolder: $dataObj")
+            Log.d(TAG, "onBindViewHolder obj: $dataObj")
             holder.userName.text = dataObj.uname
             holder.desc.text = dataObj.desc
             holder.title.text = dataObj.title
-            Log.d(TAG, "onBindViewHolder: ${dataObj.image}")
+            Log.d(TAG, "onBindViewHolder img: ${dataObj.image}")
             val picasso = Picasso.get()
-            picasso.load(Uri.parse(dataObj.image)).into(holder.quesImg)
-            picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile).into(holder.userImage)
+            if (dataObj.image?.contains("http") == true)
+                picasso.load(Uri.parse(dataObj.image)).into(holder.quesImg)
+            if (dataObj.userPicUrl?.contains("http") == true)
+                picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile)
+                    .into(holder.userImage)
 
-            Log.d(TAG, "onBindViewHolder asdasdf: ${dataObj.qualityCheck}")
+            Log.d(TAG, "onBindViewHolder qualityCheck: ${dataObj.qualityCheck}")
             if (dataObj.qualityCheck == "fail") {
                 holder.failBtn.visibility = View.GONE
                 holder.passBtn.visibility = View.VISIBLE
@@ -82,9 +86,10 @@ class QuestionsAdapter(
             holder.failBtn.setOnClickListener {
                 viewModel.updateQues(dataObj.iD.toString(), "fail")
             }
-        } catch (e: Exception) {
-            Log.d(TAG, "onBindViewHolder: $e")
         }
+//        } catch (e: Exception) {
+//            Log.d(TAG, "onBindViewHolder: $e")
+//        }
     }
 
     /**Below class is BottomSheetDialogFragment to display a sheet to play audio.  */

@@ -49,10 +49,10 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
                                 d.getBoolean("checkLike"),
                                 d.getString("tanswers"),
                                 d.getString("likedByUser"),
-                                d.getString("image") ?: "",
+                                d.getString("image") ?: "NA",
                                 d.getString("imageRef"),
                                 d.getString("userId"),
-                                d.getString("userPicUrl"),
+                                d.getString("userPicUrl") ?: "NA",
                                 d.getString("portal"),
                                 d.getString("audio"),
                                 d.getString("audioRef"),
@@ -90,13 +90,14 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
                                 d.getBoolean("checkLike"),
                                 d.getString("tanswers"),
                                 d.getString("likedByUser"),
-                                d.getString("image"),
-                                d.getString("userId"),
-                                d.getString("userPicUrl"),
+                                d.getString("image") ?: "NA",
                                 d.getString("imageRef"),
+                                d.getString("userId"),
+                                d.getString("userPicUrl") ?: "NA",
                                 d.getString("portal"),
                                 d.getString("audio"),
                                 d.getString("audioRef"),
+                                d.getString("quesImgPath") ?: "NA",
                                 d.getString("qualityCheck")
                             )
                         } as ArrayList<QuestionsModel>
@@ -130,13 +131,14 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
                                 d.getBoolean("checkLike"),
                                 d.getString("tanswers"),
                                 d.getString("likedByUser"),
-                                d.getString("image"),
-                                d.getString("userId"),
-                                d.getString("userPicUrl"),
+                                d.getString("image") ?: "NA",
                                 d.getString("imageRef"),
+                                d.getString("userId"),
+                                d.getString("userPicUrl") ?: "NA",
                                 d.getString("portal"),
                                 d.getString("audio"),
                                 d.getString("audioRef"),
+                                d.getString("quesImgPath") ?: "NA",
                                 d.getString("qualityCheck")
                             )
                         } as ArrayList<QuestionsModel>

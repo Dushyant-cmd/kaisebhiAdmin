@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -46,10 +47,7 @@ class MainActivity : AppCompatActivity() {
         pendingFragment = FragmentPending("pending")
         failFragment = FragmentFail("fail")
         passFragment = FragmentPass("pass")
-        //Api call for all question based on filter
-        viewModel.getFailQues("fail", 10)
-        viewModel.getPendingQues("pending", 10)
-        viewModel.getPassQues("pass", 10)
+        getData()
         //setup ViewPager
         val pagerAdapter = MainViewPagerAdapter(supportFragmentManager)
         pagerAdapter.addFragmentAndTitle(pendingFragment, "QC Pending")
@@ -61,7 +59,20 @@ class MainActivity : AppCompatActivity() {
         setObservers()
     }
 
+    /**Below method call all the api requests. */
+    fun getData() {
+        //Api call for all question based on filter
+        viewModel.getFailQues("fail", 10)
+        viewModel.getPendingQues("pending", 10)
+        viewModel.getPassQues("pass", 10)
+        binding.swipeRef.isRefreshing = false
+    }
+
     private fun setListeners() {
+        binding.swipeRef.setOnRefreshListener {
+            binding.swipeRef.isRefreshing = true
+            getData()
+        }
         binding.navigationMenu.setNavigationItemSelectedListener(object: NavigationView.OnNavigationItemSelectedListener {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 return when(item.itemId) {
@@ -76,7 +87,16 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.logOut -> {
-                        logOut()
+                        val dialog = AlertDialog.Builder(this@MainActivity)
+                        dialog.setMessage("Are you sure to log-out")
+                        dialog.setPositiveButton("Yes"
+                        ) { p0, p1 -> logOut() }
+
+                        dialog.setNegativeButton("No"
+                        ) { dialogInterface, p1 ->
+                            //cancel
+                        }
+                        dialog.show()
                         true
                     }
                     else -> {
@@ -90,7 +110,7 @@ class MainActivity : AppCompatActivity() {
     private fun setObservers() {
         viewModel.pendingQuesLiveData.observe(this, Observer {
             if(it is ResponseError) {
-                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "setObservers: ${it.msg}")
             } else {
                 val success = it as Success<ArrayList<QuestionsModel>>
@@ -110,9 +130,11 @@ class MainActivity : AppCompatActivity() {
         })
         viewModel.passQuesLiveData.observe(this, Observer {
             if(it is ResponseError) {
-                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
+                binding.swipeRef.isRefreshing = false
                 Log.d(TAG, "setObservers: ${it.msg}")
             } else {
+                binding.swipeRef.isRefreshing = false
                 val success = it as Success<ArrayList<QuestionsModel>>
                 passFragment.setupList(success.response)
                 Log.d(TAG, "setObservers: ${success.response}")
