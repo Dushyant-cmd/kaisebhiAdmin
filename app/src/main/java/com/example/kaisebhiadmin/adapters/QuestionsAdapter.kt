@@ -161,6 +161,9 @@ class QuestionsAdapter(
                     prepare()//Change state from idle
                 }.also {
                     binding.playerView.player = it
+                    binding.playerView.showController()
+                    binding.playerView.controllerHideOnTouch = false
+                    binding.playerView.controllerShowTimeoutMs = 0
                 }
 
                 Log.d(TAG, "initializePlayer is playing: $isPlaying")

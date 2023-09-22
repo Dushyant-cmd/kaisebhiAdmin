@@ -7,6 +7,7 @@ import com.example.kaisebhiadmin.utils.ResponseClass
 import com.example.kaisebhiadmin.utils.ResponseError
 import com.example.kaisebhiadmin.utils.Success
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.firestore.DocumentSnapshot
 
 class FirebaseApiCalls(private val application: AppCustom) {
     val pendingQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
@@ -14,6 +15,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
     val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val adminLiveData = MutableLiveData<ResponseClass>()
     val updateLiveData = MutableLiveData<ResponseClass>()
+    val reportAnsLiveData = MutableLiveData<ResponseClass>()
     private val TAG = "FirebaseApi.kt"
 
     fun getQuesApi(filterBy: String, limit: Long) {
@@ -86,6 +88,18 @@ class FirebaseApiCalls(private val application: AppCustom) {
                     "qualityCheck" to qualityCheck))
             }.addOnFailureListener {
                 updateLiveData.value = ResponseError(it.toString())
+            }
+    }
+
+    fun getReportedAnswers() {
+        application.firestore.collection("answers")
+            .whereEqualTo("userReportCheck", true).get()
+            .addOnCompleteListener {
+                if(it.isSuccessful) {
+                    reportAnsLiveData.value = Success<ArrayList<DocumentSnapshot>>(it.result.documents as ArrayList<DocumentSnapshot>)
+                } else {
+                    reportAnsLiveData.value = ResponseError(it.exception.toString())
+                }
             }
     }
 }

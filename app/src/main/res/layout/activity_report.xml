@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <data>
 
+    <data>
+        <variable
+            name="model"
+            type="com.example.kaisebhiadmin.ui.report.ReportViewModel" />
     </data>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".ui.report.ReportActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <!--        <com.google.android.material.appbar.AppBarLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="?android:attr/actionBarSize">-->
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/reportAnsList"/>
-    </RelativeLayout>
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/orangeLight"
+            app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
+            app:title="Reported Answers"
+            app:titleTextColor="@color/white" />
+        <!--        </com.google.android.material.appbar.AppBarLayout>-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/reportAnsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 </layout>

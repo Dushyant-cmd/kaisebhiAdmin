@@ -14,7 +14,9 @@
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/playerView"
             android:layout_width="match_parent"
-            android:layout_height="50dp"/>
+            app:show_timeout="0"
+            app:auto_show="true"
+            android:layout_height="100dp"/>
 <!--        <com.google.android.exoplayer2.ui.SimpleExoPlayerView-->
 <!--            android:id="@+id/exoPlayer"-->
 <!--            android:layout_width="match_parent"-->

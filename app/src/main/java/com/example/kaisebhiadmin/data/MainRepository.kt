@@ -12,6 +12,7 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
     val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val adminLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val updateLivedata = MutableLiveData<ResponseClass>()
+    val reportAnsLiveData = MutableLiveData<ResponseClass>()
 
     /**Below method get pending questions */
     suspend fun getPendingQues(filterBy: String, limit: Long) {
@@ -57,6 +58,16 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
         withContext(Dispatchers.Main) {
             firebaseInterface.updateLiveData.observeForever {
                 updateLivedata.value = it
+            }
+        }
+    }
+
+    /**Below method to get all the reported answers */
+    suspend fun getReportedAnswers() {
+        firebaseInterface.getReportedAnswers()
+        withContext(Dispatchers.Main) {
+            firebaseInterface.reportAnsLiveData.observeForever {
+                reportAnsLiveData.value = it
             }
         }
     }
