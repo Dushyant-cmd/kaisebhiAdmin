@@ -67,18 +67,9 @@ dependencies {
     implementation("com.google.gms:google-services:4.3.15")
     //circle image view
     implementation("de.hdodenhof:circleimageview:3.0.0")
-    // ExoPlayer
-//    implementation("com.google.android.exoplayer:exoplayer:r2.4.0")
-//// for core support in exoplayer.
-//    implementation("com.google.android.exoplayer:exoplayer-core:r2.4.0")
-//// for adding dash support in our exoplayer.
-//    implementation("com.google.android.exoplayer:exoplayer-dash:r2.4.0")
-//// for adding hls support in exoplayer.
-//    implementation("com.google.android.exoplayer:exoplayer-hls:r2.4.0")
-//// for smooth streaming of video in our exoplayer.
-//    implementation("com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.0")
-//// for generating default ui of exoplayer
-//    implementation("com.google.android.exoplayer:exoplayer-ui:r2.4.0")
+    implementation("com.google.android.exoplayer:exoplayer-core:2.19.1")
+    implementation("com.google.android.exoplayer:exoplayer-ui:2.19.1")
+    implementation("com.google.android.exoplayer:exoplayer-smoothstreaming:2.19.1")
     //glide
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")

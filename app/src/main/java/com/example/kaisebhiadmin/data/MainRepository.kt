@@ -52,8 +52,8 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
     }
 
     /**Below method will update status of question */
-    suspend fun updateQues(docId: String, status: String) {
-        firebaseInterface.updateStatus(docId, status)
+    suspend fun updateQues(docId: String, status: String, pos: Int, qualityCheck:String) {
+        firebaseInterface.updateStatus(docId, status, pos, qualityCheck)
         withContext(Dispatchers.Main) {
             firebaseInterface.updateLiveData.observeForever {
                 updateLivedata.value = it

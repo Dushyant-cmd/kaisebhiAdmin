@@ -50,6 +50,8 @@ class FragmentPass(private val quesStatus: String) : Fragment() {
             adapter = QuestionsAdapter(list, it, viewModel,
                 it.supportFragmentManager)
             binding.recyclerView.adapter = adapter
+            adapter!!.submitList(list)
+            adapter!!.notifyDataSetChanged()
         }
         Log.d(TAG, "setObservers success pass: ${list.size}")
     }

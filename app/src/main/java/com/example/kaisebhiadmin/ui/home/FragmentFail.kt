@@ -45,12 +45,15 @@ class FragmentFail(private val quesStatus: String) : Fragment() {
 
     fun setupList(list2: ArrayList<QuestionsModel>) {
         this.list = list2
-        Log.d(TAG, "setupList: $adapter")
         activity?.let {
-            adapter = QuestionsAdapter(list, it, viewModel, it.supportFragmentManager)
+            Log.d(TAG, "setupList fail: ${list[0].qualityCheck}")
+            val viewModel = (activity as MainActivity).viewModel
+            adapter = QuestionsAdapter(list, it, viewModel,
+                it.supportFragmentManager)
             binding.recyclerView.adapter = adapter
+            adapter!!.submitList(list)
+            adapter!!.notifyDataSetChanged()
         }
-        Log.d(TAG, "setObservers success fail: $list")
     }
 
 }

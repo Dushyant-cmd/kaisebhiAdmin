@@ -75,12 +75,15 @@ class FirebaseApiCalls(private val application: AppCustom) {
             )
     }
 
-    fun updateStatus(docId: String, status: String) {
+    fun updateStatus(docId: String, status: String, pos: Int, qualityCheck: String) {
         val map = mapOf("qualityCheck" to status)
         application.firestore.collection("questions")
             .document(docId).update(map)
             .addOnSuccessListener {
-                updateLiveData.value = Success<String>("Success")
+                updateLiveData.value = Success<Map<String, String>>(mapOf("docId" to docId,
+                    "status" to status,
+                    "pos" to pos.toString(),
+                    "qualityCheck" to qualityCheck))
             }.addOnFailureListener {
                 updateLiveData.value = ResponseError(it.toString())
             }

@@ -109,9 +109,9 @@
             android:id="@+id/playBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#F8A991"
-            android:layout_marginVertical="10dp"
             android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            android:backgroundTint="#F8A991"
             android:text="Play Audio" />
 
         <TextView
@@ -134,20 +134,20 @@
             android:weightSum="2">
 
             <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
                 android:id="@+id/failBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:backgroundTint="@android:color/holo_red_light"
-                android:text="QC Fail"/>
+                android:text="QC Fail" />
 
             <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_height="wrap_content"
                 android:id="@+id/passBtn"
-                android:text="QC Pass"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="QC Pass" />
         </LinearLayout>
 
     </LinearLayout>

@@ -10,14 +10,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
-import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kaisebhiadmin.R
+import com.example.kaisebhiadmin.databinding.BottomSheetLayoutBinding
 import com.example.kaisebhiadmin.models.QuestionsModel
 import com.example.kaisebhiadmin.ui.home.MainViewModel
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
 
@@ -64,27 +70,47 @@ class QuestionsAdapter(
                     .into(holder.userImage)
 
             Log.d(TAG, "onBindViewHolder qualityCheck: ${dataObj.qualityCheck}")
-            if (dataObj.qualityCheck == "fail") {
-                holder.failBtn.visibility = View.GONE
-                holder.passBtn.visibility = View.VISIBLE
-            } else if (dataObj.qualityCheck == "pass") {
-                holder.passBtn.visibility == View.GONE
-                holder.failBtn.visibility = View.VISIBLE
-            } else {
-                holder.failBtn.visibility = View.VISIBLE
-                holder.passBtn.visibility = View.VISIBLE
+            when (dataObj.qualityCheck) {
+                "fail" -> {
+                    holder.failBtn.visibility = View.GONE
+                    holder.passBtn.visibility = View.VISIBLE
+                }
+
+                "pass" -> {
+                    holder.passBtn.visibility = View.GONE
+                    holder.failBtn.visibility = View.VISIBLE
+                }
+
+                "pending" -> {
+                    holder.failBtn.visibility = View.VISIBLE
+                    holder.passBtn.visibility = View.VISIBLE
+                }
             }
+
+            if(dataObj.audio.isNullOrEmpty())
+                holder.audioBtn.visibility = View.GONE
+
             holder.audioBtn.setOnClickListener {
                 val sheet = PlayerBottomSheet(dataObj.audio!!)
                 sheet.show(fm, "audio")
             }
 
             holder.passBtn.setOnClickListener {
-                viewModel.updateQues(dataObj.iD.toString(), "pass")
+                viewModel.updateQues(
+                    dataObj.iD.toString(),
+                    "pass",
+                    position,
+                    dataObj.qualityCheck!!
+                )
             }
 
             holder.failBtn.setOnClickListener {
-                viewModel.updateQues(dataObj.iD.toString(), "fail")
+                viewModel.updateQues(
+                    dataObj.iD.toString(),
+                    "fail",
+                    position,
+                    dataObj.qualityCheck!!
+                )
             }
         }
 //        } catch (e: Exception) {
@@ -93,24 +119,51 @@ class QuestionsAdapter(
     }
 
     /**Below class is BottomSheetDialogFragment to display a sheet to play audio.  */
+    /**Below class is BottomSheetDialogFragment to display a sheet to play audio.  */
     class PlayerBottomSheet(private val downloadUrl: String) : BottomSheetDialogFragment() {
-        private lateinit var exoPlayer: SimpleExoPlayer
+        private var exoPlayer: com.google.android.exoplayer2.ExoPlayer? = null
+        private lateinit var binding: BottomSheetLayoutBinding
+        private val isPlaying get() = exoPlayer?.isPlaying ?: false
         private val TAG = "PlayerBottomSheet.java"
         override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, saveInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            saveInstanceState: Bundle?
         ): View? {
-            val view = inflater.inflate(R.layout.bottom_sheet_layout, container, false)
-//            setupAudio(view.findViewById(), downloadUrl)
-            return view
+            binding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_layout, container, false)
+            initializePlayer(binding.playerView, downloadUrl)
+            return binding.root
         }
 
         /**Below method is to play audio media using ExoPlayer library with its default controller
          * @param playerView xml view on which all the control or media related view will be displayed
          * @param downloadUrl it is a http protocol url to play dynamic media over internet.
          */
-        private fun setupAudio(playerView: SimpleExoPlayer, downloadUrl: String) {
+        private fun initializePlayer(playerView: PlayerView, audioUrl: String) {
             try {
+                //Create ExoPlayer instance
+                exoPlayer = activity?.let { com.google.android.exoplayer2.ExoPlayer.Builder(it).build() }
+                //Create a MediaItem
+                val mediaItem = MediaItem.Builder()
+                    .setUri(audioUrl)
+                    .setMimeType(MimeTypes.AUDIO_AAC)
+                    .build()
+                //Create MediaSource and pass the media item
+                val mediaSource = ProgressiveMediaSource.Factory(
+                    DefaultDataSource.Factory(requireActivity())
+                ).createMediaSource(mediaItem)
 
+                //Attach mediaSource to exoPlayer and attach exoPlayer on PlayerView
+                exoPlayer!!.apply {
+                    setMediaSource(mediaSource)
+                    playWhenReady = true //auto play when ready by decoding and getting resources
+                    seekTo(0, 0L) //seek to start of media.
+                    prepare()//Change state from idle
+                }.also {
+                    binding.playerView.player = it
+                }
+
+                Log.d(TAG, "initializePlayer is playing: $isPlaying")
             } catch (e: Exception) {
                 Log.d(TAG, "setupAudio: $e")
             }
@@ -118,6 +171,8 @@ class QuestionsAdapter(
 
         override fun onDestroy() {
             super.onDestroy()
+            exoPlayer!!.stop()
+            exoPlayer!!.release()
             Log.d(TAG, "onDestroy: sheet destroyed")
         }
     }

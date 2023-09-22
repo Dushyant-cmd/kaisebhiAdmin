@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.getFailQues("fail", 10)
         viewModel.getPendingQues("pending", 10)
         viewModel.getPassQues("pass", 10)
-        binding.swipeRef.isRefreshing = false
     }
 
     private fun setListeners() {
@@ -114,8 +113,9 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "setObservers: ${it.msg}")
             } else {
                 val success = it as Success<ArrayList<QuestionsModel>>
+                binding.swipeRef.isRefreshing = false
                 pendingFragment.setupList(success.response)
-                Log.d(TAG, "setObservers: ${success.response}")
+                Log.d(TAG, "setObservers pending: ${success.response}")
             }
         })
         viewModel.failQuesLiveData.observe(this, Observer {
@@ -124,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "setObservers: ${it.msg}")
             } else {
                 val success = it as Success<ArrayList<QuestionsModel>>
+                binding.swipeRef.isRefreshing = false
                 failFragment.setupList(success.response)
                 Log.d(TAG, "setObservers: ${success.response}")
             }
@@ -136,8 +137,32 @@ class MainActivity : AppCompatActivity() {
             } else {
                 binding.swipeRef.isRefreshing = false
                 val success = it as Success<ArrayList<QuestionsModel>>
+                binding.swipeRef.isRefreshing = false
                 passFragment.setupList(success.response)
-                Log.d(TAG, "setObservers: ${success.response}")
+                Log.d(TAG, "setObservers pass: ${success.response}")
+            }
+        })
+
+        viewModel.updateLiveData.observe(this@MainActivity, Observer {
+            if(it is Success<*>) {
+//                val map = it.response as Map<*, *>
+//                when(map.get("status")) {
+//                    "fail" -> viewModel.getFailQues("fail", 10)
+//                    "pass" -> viewModel.getPassQues("pass", 10)
+//                }
+//
+//                when(map.get("qualityCheck")) {
+//                    "fail" -> viewModel.getFailQues("fail", 10)
+//                    "pass" -> viewModel.getPassQues("pass", 10)
+//                    "pending" -> viewModel.getPendingQues("pass", 10)
+//                }
+                binding.swipeRef.isRefreshing = true
+                getData()
+                Toast.makeText(this@MainActivity, it.response.toString(), Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "setObservers: ${it.response}")
+            } else if(it is ResponseError) {
+                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "setObservers: ${it.msg}")
             }
         })
     }
@@ -147,4 +172,9 @@ class MainActivity : AppCompatActivity() {
         application.sessionConfig.clear()
         startActivity(Intent(this, SignInActivity::class.java))
     }
+
+    /**Below method will notify list about item. */
+//    fun notifyList(pos: String) {
+//
+//    }
 }

@@ -18,9 +18,9 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
     val failQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val updateLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
-    fun updateQues(docId: String, status: String) {
+    fun updateQues(docId: String, status: String, position: Int, qualityCheck: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.updateQues(docId, status)
+            repo.updateQues(docId, status, position, qualityCheck)
         }
         repo.updateLivedata.observeForever {
             updateLiveData.value = it
