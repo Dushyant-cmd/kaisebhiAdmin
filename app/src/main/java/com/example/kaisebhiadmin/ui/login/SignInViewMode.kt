@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kaisebhiadmin.data.MainRepository
 import com.example.kaisebhiadmin.utils.ResponseClass
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -22,4 +21,12 @@ class SignInViewMode(private val mainRepository: MainRepository): ViewModel(){
             adminLiveData.value = it
         }
     }
+
+    fun updateFcmTokens(currToken: String) {
+        viewModelScope.launch(Dispatchers.IO){
+            mainRepository.updateFcmTokens(currToken)
+        }
+    }
+
+    /**Below method will update fcm tokens */
 }

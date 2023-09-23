@@ -21,17 +21,24 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         sessionConfig = (application as AppCustom).sessionConfig
         lifecycleScope.launch {
             delay(2000)
-            when(sessionConfig.getLoginStatus()) {
+            when (sessionConfig.getLoginStatus()) {
                 true -> {
-                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
                 }
+
                 false -> {
-                    startActivity(Intent(this@SplashActivity, SignInActivity::class.java))
-                }
+                    val intent = Intent(this@SplashActivity, SignInActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)                }
             }
         }
     }

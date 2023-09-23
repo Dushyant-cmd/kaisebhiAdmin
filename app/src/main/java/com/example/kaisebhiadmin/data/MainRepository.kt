@@ -13,6 +13,7 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
     val adminLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val updateLivedata = MutableLiveData<ResponseClass>()
     val reportAnsLiveData = MutableLiveData<ResponseClass>()
+    val deleteAnsLiveData = MutableLiveData<ResponseClass>()
 
     /**Below method get pending questions */
     suspend fun getPendingQues(filterBy: String, limit: Long) {
@@ -63,12 +64,27 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
     }
 
     /**Below method to get all the reported answers */
-    suspend fun getReportedAnswers() {
-        firebaseInterface.getReportedAnswers()
+    suspend fun getReportedAnswers(limit: Long) {
+        firebaseInterface.getReportedAnswers(limit)
         withContext(Dispatchers.Main) {
             firebaseInterface.reportAnsLiveData.observeForever {
                 reportAnsLiveData.value = it
             }
         }
+    }
+
+    /**Below method will delete the answer
+     * @param docId document id of answer collection */
+    suspend fun deleteAnswer(docId: String) {
+        firebaseInterface.deleteAnswer(docId)
+        withContext(Dispatchers.Main) {
+            firebaseInterface.deleteAnsLiveData.observeForever {
+                deleteAnsLiveData.value = it
+            }
+        }
+    }
+
+    fun updateFcmTokens(currToken: String) {
+        firebaseInterface.updateFcmTokens(currToken)
     }
 }

@@ -9,27 +9,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activities.Splash"
+        android:background="#FFFFFF"
         android:orientation="vertical"
         android:gravity="center">
 
-        <androidx.cardview.widget.CardView
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:cardCornerRadius="16dp"-->
+<!--            app:cardBackgroundColor="#FAA830">-->
+
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Admin Panel"-->
+<!--                android:textSize="32sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:padding="16dp"-->
+<!--                android:textColor="#F6F6F6"/>-->
+
+<!--        </androidx.cardview.widget.CardView>-->
+
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardBackgroundColor="#FAA830">
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Admin Panel"
-                android:textSize="32sp"
-                android:textStyle="bold"
-                android:padding="16dp"
-                android:textColor="#F6F6F6"/>
-
-        </androidx.cardview.widget.CardView>
-
+            android:src="@mipmap/kaisebhi_admin"/>
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

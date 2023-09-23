@@ -2,6 +2,7 @@
 <layout>
 
     <data>
+
         <variable
             name="model"
             type="com.example.kaisebhiadmin.ui.report.ReportViewModel" />
@@ -29,9 +30,35 @@
             app:titleTextColor="@color/white" />
         <!--        </com.google.android.material.appbar.AppBarLayout>-->
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/reportAnsList"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swiperef"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:visibility="visible"
+                    android:id="@+id/shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#fff"
+                    android:elevation="1dp"
+                    app:duration="800">
+
+                    <include layout="@layout/placeholder_layout" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:visibility="gone"
+                    android:id="@+id/reportAnsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 </layout>

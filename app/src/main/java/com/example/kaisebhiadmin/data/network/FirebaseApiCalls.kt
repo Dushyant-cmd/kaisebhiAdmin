@@ -8,6 +8,7 @@ import com.example.kaisebhiadmin.utils.ResponseError
 import com.example.kaisebhiadmin.utils.Success
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseApiCalls(private val application: AppCustom) {
     val pendingQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
@@ -16,9 +17,10 @@ class FirebaseApiCalls(private val application: AppCustom) {
     val adminLiveData = MutableLiveData<ResponseClass>()
     val updateLiveData = MutableLiveData<ResponseClass>()
     val reportAnsLiveData = MutableLiveData<ResponseClass>()
+    val deleteAnsLiveData = MutableLiveData<ResponseClass>()
     private val TAG = "FirebaseApi.kt"
 
-    fun getQuesApi(filterBy: String, limit: Long) {
+    suspend fun getQuesApi(filterBy: String, limit: Long) {
         Log.d(TAG, "getQuesApi filter by: $filterBy")
         if(filterBy.equals("pending")) {
             application.firestore.collection("questions").whereEqualTo("qualityCheck", filterBy)
@@ -62,7 +64,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
         }
     }
 
-    fun getAdminCred() {
+    suspend fun getAdminCred() {
         application.firestore.collection("appData")
             .document("admin").get().addOnCompleteListener(
                 OnCompleteListener {
@@ -77,7 +79,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
             )
     }
 
-    fun updateStatus(docId: String, status: String, pos: Int, qualityCheck: String) {
+    suspend fun updateStatus(docId: String, status: String, pos: Int, qualityCheck: String) {
         val map = mapOf("qualityCheck" to status)
         application.firestore.collection("questions")
             .document(docId).update(map)
@@ -91,15 +93,33 @@ class FirebaseApiCalls(private val application: AppCustom) {
             }
     }
 
-    fun getReportedAnswers() {
+    suspend fun getReportedAnswers(limit: Long) {
         application.firestore.collection("answers")
-            .whereEqualTo("userReportCheck", true).get()
+            .whereEqualTo("userReportCheck", true).limit(limit).get()
             .addOnCompleteListener {
                 if(it.isSuccessful) {
                     reportAnsLiveData.value = Success<ArrayList<DocumentSnapshot>>(it.result.documents as ArrayList<DocumentSnapshot>)
                 } else {
                     reportAnsLiveData.value = ResponseError(it.exception.toString())
                 }
+            }
+    }
+
+    suspend fun deleteAnswer(docId: String) {
+        application.firestore.collection("answers").document(docId)
+            .delete().addOnSuccessListener {
+                deleteAnsLiveData.value = Success("Answer Deleted Successfully")
+            }.addOnFailureListener {
+                deleteAnsLiveData.value = ResponseError(it.toString())
+            }
+    }
+
+    fun updateFcmTokens(currToken: String) {
+        val map = mapOf("adminFcmTokens" to currToken)
+        FirebaseFirestore.getInstance().collection("appData")
+            .document("admin").update(map)
+            .addOnCompleteListener {
+                Log.d(TAG, "setObservers: ${it.result}")
             }
     }
 }

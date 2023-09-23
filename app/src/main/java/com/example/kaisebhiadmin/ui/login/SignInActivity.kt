@@ -17,7 +17,6 @@ import com.example.kaisebhiadmin.utils.AppCustom
 import com.example.kaisebhiadmin.utils.ResponseError
 import com.example.kaisebhiadmin.utils.Success
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 
 class SignInActivity : AppCompatActivity() {
@@ -28,7 +27,7 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var fcm: FirebaseMessaging
     private lateinit var existingTokens: String
     private val TAG = "SignInActivity.kt"
-    private lateinit var currToken: String
+    private var currToken: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_in)
@@ -39,6 +38,8 @@ class SignInActivity : AppCompatActivity() {
         fcm = FirebaseMessaging.getInstance()
         fcm.token.addOnSuccessListener {
             currToken = it
+        }.addOnFailureListener {
+            currToken = ""
         }
         viewModel.getAdminCred()
         setObservers()
@@ -80,18 +81,27 @@ class SignInActivity : AppCompatActivity() {
                     pass = success.response.getString("password") as String
                     existingTokens = success.response.getString("adminFcmTokens") as String
 
-                    if(currToken.length > 2) {
-                        val map = mapOf("adminFcmTokens" to "$existingTokens,$currToken")
-                        FirebaseFirestore.getInstance().collection("appData")
-                            .document("admin").update(map)
-                            .addOnCompleteListener {
-                                Log.d(TAG, "setObservers: ${it.result}")
+                    if(currToken.isNotEmpty()) {
+                        for(e in existingTokens.split(",")) {
+                            Log.d(TAG, "setObservers: $e")
+                            if(currToken != e) {
+                                currToken = "$currToken,$e"
+                            } else {
+                                return@let
                             }
+                        }
                     }
+                    existingTokens += ",$currToken"
+                    updateToken()
                 }
                 Log.d(TAG, "setObservers: ${it.response}")
                 Toast.makeText(this, "$it", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun updateToken() {
+        viewModel.updateFcmTokens(currToken)
+        currToken = ""
     }
 }

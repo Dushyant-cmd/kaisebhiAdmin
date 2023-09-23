@@ -15,11 +15,12 @@ import kotlinx.coroutines.launch
 class ReportViewModel(private val repo: MainRepository): ViewModel() {
     private val TAG = "ReportedViewModel.kt"
     val reportAnsLiveData = MutableLiveData<ResponseClass>()
+    val deleteAnsLiveData = MutableLiveData<ResponseClass>()
 
     /**Below method will get the reported answers */
-    fun getReportedAnswers() {
+    fun getReportedAnswers(limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getReportedAnswers()
+            repo.getReportedAnswers(limit)
         }
 
         repo.reportAnsLiveData.observeForever {res: ResponseClass ->
@@ -28,11 +29,24 @@ class ReportViewModel(private val repo: MainRepository): ViewModel() {
                     .map {
                         ReportedModel(it.id,
                             it.getString("title"),
-                            it.getString("ques"),
+                            it.getString("qdesc"),
+                            it.getString("answer"),
                             it.getString("reportBy"))
                     }
-                Log.d(TAG, "getReportedAnswers: ${(res).response}")
+
+                reportAnsLiveData.value = Success(extractRes as ArrayList<ReportedModel>)
+                Log.d(TAG, "getReportedAnswers: $extractRes")
             } else reportAnsLiveData.value = res
+        }
+    }
+
+    fun deleteAnswer(docId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.deleteAnswer(docId)
+        }
+
+        repo.deleteAnsLiveData.observeForever {
+            deleteAnsLiveData.value = it
         }
     }
 }
