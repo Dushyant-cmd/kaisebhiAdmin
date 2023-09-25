@@ -9,6 +9,7 @@ import com.example.kaisebhiadmin.utils.Success
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class FirebaseApiCalls(private val application: AppCustom) {
     val pendingQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
@@ -20,47 +21,63 @@ class FirebaseApiCalls(private val application: AppCustom) {
     val deleteAnsLiveData = MutableLiveData<ResponseClass>()
     private val TAG = "FirebaseApi.kt"
 
-    suspend fun getQuesApi(filterBy: String, limit: Long) {
+    suspend fun getQuesApi(filterBy: String, limit: Long, lastDoc: DocumentSnapshot?) {
         Log.d(TAG, "getQuesApi filter by: $filterBy")
-        if(filterBy.equals("pending")) {
-            application.firestore.collection("questions").whereEqualTo("qualityCheck", filterBy)
-                .limit(limit)
-                .get().addOnCompleteListener(OnCompleteListener {
-                    if (it.isSuccessful) {
-                        pendingQuesLiveData.value = Success(it.result.documents)
-                        Log.d(TAG, "getQuesApi: ${it.result.documents}")
-                    }
-                    else {
-                        pendingQuesLiveData.value = ResponseError(it.exception.toString())
-                        Log.d(TAG, "getQuesApi: ${it.exception}")
-                    }
-                })
-        } else if(filterBy.equals("fail")) {
-            application.firestore.collection("questions").whereEqualTo("qualityCheck", filterBy)
-                .limit(limit)
-                .get().addOnCompleteListener(OnCompleteListener {
-                    if (it.isSuccessful) {
-                        failQuesLiveData.value = Success(it.result.documents)
-                        Log.d(TAG, "getQuesApi fail: ${it.result.documents}")
-                    }
-                    else {
-                        failQuesLiveData.value = ResponseError(it.exception.toString())
-                        Log.d(TAG, "getQuesApi fail: ${it.exception}")
-                    }
-                })
-        } else if(filterBy.equals("pass")) {
-            application.firestore.collection("questions").whereEqualTo("qualityCheck", filterBy)
-                .limit(limit)
-                .get().addOnCompleteListener(OnCompleteListener {
-                    if (it.isSuccessful) {
-                        passQuesLiveData.value = Success(it.result.documents)
-                        Log.d(TAG, "getQuesApi pass: ${it.result.documents}")
-                    }
-                    else {
-                        passQuesLiveData.value = ResponseError(it.exception.toString())
-                        Log.d(TAG, "getQuesApi pass: ${it.exception}")
-                    }
-                })
+        if (filterBy.equals("pending")) {
+            if (lastDoc == null) {
+                val collection = application.firestore.collection("questions")
+                collection.whereEqualTo("qualityCheck", filterBy)
+                collection.orderBy("timestamp", Query.Direction.DESCENDING)
+                collection.startAfter(lastDoc)
+                collection.limit(limit)
+                    .get().addOnCompleteListener(OnCompleteListener {
+                        if (it.isSuccessful) {
+                            pendingQuesLiveData.value = Success(it.result.documents)
+                            Log.d(TAG, "getQuesApi: ${it.result.documents}")
+                        } else {
+                            pendingQuesLiveData.value = ResponseError(it.exception.toString())
+                            Log.d(TAG, "getQuesApi: ${it.exception}")
+                        }
+                    })
+            } else {
+                val collection = application.firestore.collection("questions")
+                collection.whereEqualTo("qualityCheck", filterBy)
+                collection.orderBy("timestamp", Query.Direction.DESCENDING)
+                collection.limit(limit)
+                    .get().addOnCompleteListener(OnCompleteListener {
+                        if (it.isSuccessful) {
+                            pendingQuesLiveData.value = Success(it.result.documents)
+                            Log.d(TAG, "getQuesApi: ${it.result.documents}")
+                        } else {
+                            pendingQuesLiveData.value = ResponseError(it.exception.toString())
+                            Log.d(TAG, "getQuesApi: ${it.exception}")
+                        }
+                    })
+            }
+        } else if (filterBy.equals("fail")) {
+//            application.firestore.collection("questions").whereEqualTo("qualityCheck", filterBy)
+//                .limit(limit)
+//                .get().addOnCompleteListener(OnCompleteListener {
+//                    if (it.isSuccessful) {
+//                        failQuesLiveData.value = Success(it.result.documents)
+//                        Log.d(TAG, "getQuesApi fail: ${it.result.documents}")
+//                    } else {
+//                        failQuesLiveData.value = ResponseError(it.exception.toString())
+//                        Log.d(TAG, "getQuesApi fail: ${it.exception}")
+//                    }
+//                })
+        } else if (filterBy.equals("pass")) {
+//            application.firestore.collection("questions").whereEqualTo("qualityCheck", filterBy)
+//                .limit(limit)
+//                .get().addOnCompleteListener(OnCompleteListener {
+//                    if (it.isSuccessful) {
+//                        passQuesLiveData.value = Success(it.result.documents)
+//                        Log.d(TAG, "getQuesApi pass: ${it.result.documents}")
+//                    } else {
+//                        passQuesLiveData.value = ResponseError(it.exception.toString())
+//                        Log.d(TAG, "getQuesApi pass: ${it.exception}")
+//                    }
+//                })
         }
     }
 
@@ -84,10 +101,14 @@ class FirebaseApiCalls(private val application: AppCustom) {
         application.firestore.collection("questions")
             .document(docId).update(map)
             .addOnSuccessListener {
-                updateLiveData.value = Success<Map<String, String>>(mapOf("docId" to docId,
-                    "status" to status,
-                    "pos" to pos.toString(),
-                    "qualityCheck" to qualityCheck))
+                updateLiveData.value = Success<Map<String, String>>(
+                    mapOf(
+                        "docId" to docId,
+                        "status" to status,
+                        "pos" to pos.toString(),
+                        "qualityCheck" to qualityCheck
+                    )
+                )
             }.addOnFailureListener {
                 updateLiveData.value = ResponseError(it.toString())
             }
@@ -97,8 +118,9 @@ class FirebaseApiCalls(private val application: AppCustom) {
         application.firestore.collection("answers")
             .whereEqualTo("userReportCheck", true).limit(limit).get()
             .addOnCompleteListener {
-                if(it.isSuccessful) {
-                    reportAnsLiveData.value = Success<ArrayList<DocumentSnapshot>>(it.result.documents as ArrayList<DocumentSnapshot>)
+                if (it.isSuccessful) {
+                    reportAnsLiveData.value =
+                        Success<ArrayList<DocumentSnapshot>>(it.result.documents as ArrayList<DocumentSnapshot>)
                 } else {
                     reportAnsLiveData.value = ResponseError(it.exception.toString())
                 }

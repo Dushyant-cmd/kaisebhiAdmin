@@ -13,11 +13,6 @@
         android:orientation="vertical"
         tools:context=".ui.home.FragmentPending">
 
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_centerInParent="true"-->
-        <!--            android:text="jskf;j"/>-->
         <androidx.recyclerview.widget.RecyclerView
             android:fitsSystemWindows="true"
             android:layout_width="match_parent"

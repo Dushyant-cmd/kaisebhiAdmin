@@ -40,7 +40,7 @@ class FragmentPending(private val quesStatus: String) : Fragment() {
     fun setupList(list2: ArrayList<QuestionsModel>) {
         list.clear()
         this.list = list2
-        Log.d(TAG, "setupList: $adapter")
+//        Log.d(TAG, "setupList: $adapter")
         activity?.let {
             val viewModel = (activity as MainActivity).viewModel
             adapter = QuestionsAdapter(list, it, viewModel,

@@ -18,6 +18,9 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
     val failQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val updateLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
+    var lastPendingDoc: DocumentSnapshot? = null
+    var lastFailDoc: DocumentSnapshot? = null
+    var lastPassDoc: DocumentSnapshot? = null
     fun updateQues(docId: String, status: String, position: Int, qualityCheck: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.updateQues(docId, status, position, qualityCheck)
@@ -30,13 +33,14 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
     //test method
     fun getPendingQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getPendingQues(filterBy, limit)
+            repo.getPendingQues(filterBy, limit, lastPendingDoc!!)
         }
         repo.pendingQuesLiveData.observeForever {
             if (it is Success<*>) {
+                val list = (it as Success<ArrayList<DocumentSnapshot>>).response
+                lastPendingDoc = list[list.size - 1]
                 val formattedList: ArrayList<QuestionsModel> =
-                    ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
-                        .map { d: DocumentSnapshot ->
+                        list.map { d: DocumentSnapshot ->
                             QuestionsModel(
                                 d.getString("id"),
                                 d.getString("title"),
@@ -70,14 +74,15 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
 
     fun getFailQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getFailQues(filterBy, limit)
+            repo.getFailQues(filterBy, limit, lastFailDoc!!)
         }
 
         repo.failQuesLiveData.observeForever {
             if (it is Success<*>) {
+                val list = (it as Success<ArrayList<DocumentSnapshot>>).response
+                lastFailDoc = list[list.size - 1]
                 val formattedList: ArrayList<QuestionsModel> =
-                    ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
-                        .map { d: DocumentSnapshot ->
+                    list.map { d: DocumentSnapshot ->
                             QuestionsModel(
                                 d.getString("id"),
                                 d.getString("title"),
@@ -111,14 +116,15 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
 
     fun getPassQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getPassQues(filterBy, limit)
+            repo.getPassQues(filterBy, limit, lastPassDoc!!)
         }
 
         repo.passQuesLiveData.observeForever {
             if (it is Success<*>) {
+                val list = (it as Success<ArrayList<DocumentSnapshot>>).response
+                lastPassDoc = list[list.size - 1]
                 val formattedList: ArrayList<QuestionsModel> =
-                    ((it as Success<DocumentSnapshot>).response as ArrayList<DocumentSnapshot>)
-                        .map { d: DocumentSnapshot ->
+                    list.map { d: DocumentSnapshot ->
                             QuestionsModel(
                                 d.getString("id"),
                                 d.getString("title"),
