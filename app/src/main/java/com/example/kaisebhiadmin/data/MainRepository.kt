@@ -3,7 +3,6 @@ package com.example.kaisebhiadmin.data
 import androidx.lifecycle.MutableLiveData
 import com.example.kaisebhiadmin.data.network.FirebaseApiCalls
 import com.example.kaisebhiadmin.utils.ResponseClass
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,8 +16,8 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
     val deleteAnsLiveData = MutableLiveData<ResponseClass>()
 
     /**Below method get pending questions */
-    suspend fun getPendingQues(filterBy: String, limit: Long, lastDoc: DocumentSnapshot?) {
-        firebaseInterface.getQuesApi(filterBy, limit, lastDoc)
+    suspend fun getPendingQues(filterBy: String, limit: Long) {
+        firebaseInterface.getQuesApi(filterBy, limit)
         withContext(Dispatchers.Main) {
             firebaseInterface.pendingQuesLiveData.observeForever {
                 pendingQuesLiveData.value = it
@@ -26,8 +25,8 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
         }
     }
     /**Below method get fail questions */
-    suspend fun getFailQues(filterBy: String, limit: Long, lastDoc: DocumentSnapshot?) {
-        firebaseInterface.getQuesApi(filterBy, limit, lastDoc)
+    suspend fun getFailQues(filterBy: String, limit: Long) {
+        firebaseInterface.getQuesApi(filterBy, limit)
         withContext(Dispatchers.Main) {
             firebaseInterface.failQuesLiveData.observeForever {
                 failQuesLiveData.value = it
@@ -35,8 +34,8 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
         }
     }
     /**Below method get pass questions */
-    suspend fun getPassQues(filterBy: String, limit: Long, lastDoc: DocumentSnapshot?) {
-        firebaseInterface.getQuesApi(filterBy, limit, lastDoc)
+    suspend fun getPassQues(filterBy: String, limit: Long) {
+        firebaseInterface.getQuesApi(filterBy, limit)
         withContext(Dispatchers.Main) {
             firebaseInterface.passQuesLiveData.observeForever {
                 passQuesLiveData.value = it

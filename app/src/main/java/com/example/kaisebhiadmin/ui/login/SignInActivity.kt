@@ -22,8 +22,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 class SignInActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignInBinding
     private lateinit var viewModel: SignInViewMode
-    private lateinit var email: String
-    private lateinit var pass: String
+    private var email: String = ""
+    private var pass: String = ""
     private lateinit var fcm: FirebaseMessaging
     private lateinit var existingTokens: String
     private val TAG = "SignInActivity.kt"

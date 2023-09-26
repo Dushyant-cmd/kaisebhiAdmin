@@ -33,7 +33,7 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
     //test method
     fun getPendingQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getPendingQues(filterBy, limit, lastPendingDoc!!)
+            repo.getPendingQues(filterBy, limit)
         }
         repo.pendingQuesLiveData.observeForever {
             if (it is Success<*>) {
@@ -74,7 +74,7 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
 
     fun getFailQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getFailQues(filterBy, limit, lastFailDoc!!)
+            repo.getFailQues(filterBy, limit)
         }
 
         repo.failQuesLiveData.observeForever {
@@ -116,7 +116,7 @@ class MainViewModel(private val repo: MainRepository) : ViewModel() {
 
     fun getPassQues(filterBy: String, limit: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getPassQues(filterBy, limit, lastPassDoc!!)
+            repo.getPassQues(filterBy, limit)
         }
 
         repo.passQuesLiveData.observeForever {
