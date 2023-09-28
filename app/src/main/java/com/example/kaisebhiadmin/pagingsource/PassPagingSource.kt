@@ -11,12 +11,15 @@ import kotlinx.coroutines.tasks.await
 
 class PassPagingSource(private val firebaseApiCalls: FirebaseApiCalls): PagingSource<Int, QuestionsModel>() {
     private val TAG = "PassPaging.kt"
+    private var lastDoc: DocumentSnapshot? = null
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, QuestionsModel> {
         return try {
             val pos = params.key ?: 1
-            val apiCalls = firebaseApiCalls.getQuesApi("pass", 10)
-            var loadResult: LoadResult<Int, QuestionsModel>? = null
+            val apiCalls = firebaseApiCalls.getQuesApi("pass", 10, lastDoc)
+            lateinit var loadResult: LoadResult<Int, QuestionsModel>
             apiCalls.addOnSuccessListener {
+                if(it.documents.size > 0)
+                    lastDoc = it.documents[it.documents.size - 1]
                 val formattedList: ArrayList<QuestionsModel> =
                     it.documents.map { d: DocumentSnapshot ->
                         QuestionsModel(
@@ -44,8 +47,8 @@ class PassPagingSource(private val firebaseApiCalls: FirebaseApiCalls): PagingSo
                     } as ArrayList<QuestionsModel>
                 loadResult = LoadResult.Page(
                     data = formattedList,
-                    prevKey = if(pos == 1) null else pos.plus(1),
-                    nextKey = if(pos == 100) null else pos.minus(1)
+                    prevKey = if(pos == 1) null else pos.minus(1),
+                    nextKey = if(pos == 100) null else pos.plus(1)
                 )
             }
 
@@ -55,7 +58,13 @@ class PassPagingSource(private val firebaseApiCalls: FirebaseApiCalls): PagingSo
 
             Tasks.whenAll(apiCalls).await()
             Log.d(TAG, "load: ${(loadResult as LoadResult.Page).data}")
-            loadResult!!
+            if(!(loadResult is LoadResult.Error)) {
+                val data = ((loadResult as LoadResult.Page<Int, QuestionsModel>).data)
+                if(data.isEmpty()) {
+                    loadResult = LoadResult.Error(java.lang.Exception("no data"))
+                }
+            }
+            loadResult
         } catch (e: Exception) {
             Log.d(TAG, "load: $e")
             LoadResult.Error(e)

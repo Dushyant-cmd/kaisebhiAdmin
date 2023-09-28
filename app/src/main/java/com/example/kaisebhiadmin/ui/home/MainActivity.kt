@@ -60,17 +60,24 @@ class MainActivity : AppCompatActivity() {
         pendingFragment = FragmentPending("pending")
         failFragment = FragmentFail("fail")
         passFragment = FragmentPass("pass")
-        getData()
         //setup ViewPager
+        setupViewPager()
+        setListeners()
+        checkAndRequestPerm()
+        setObservers()
+    }
+
+    private fun setupViewPager() {
         val pagerAdapter = MainViewPagerAdapter(supportFragmentManager)
         pagerAdapter.addFragmentAndTitle(pendingFragment, "QC Pending")
         pagerAdapter.addFragmentAndTitle(failFragment, "QC Fail")
         pagerAdapter.addFragmentAndTitle(passFragment, "QC Pass")
         binding.viewPager.adapter = pagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
-        setListeners()
-        checkAndRequestPerm()
-        setObservers()
+        binding.shimmer.stopShimmerAnimation()
+        binding.shimmer.visibility = View.GONE
+        binding.viewPagerLL.visibility = View.VISIBLE
+        binding.swipeRef.isRefreshing = false
     }
 
     private fun checkAndRequestPerm() {
@@ -88,44 +95,9 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    /**Below method call all the api requests. */
-    fun getData() {
-        binding.shimmer.startShimmerAnimation()
-        binding.shimmer.visibility = View.VISIBLE
-        binding.viewPagerLL.visibility = View.GONE
-        //Api call for all question based on filter
-        lifecycleScope.launch {
-            viewModel.getPendingQues("pending", 10).observe(this@MainActivity, Observer {
-                binding.shimmer.stopShimmerAnimation()
-                binding.shimmer.visibility = View.GONE
-                binding.viewPagerLL.visibility = View.VISIBLE
-                binding.swipeRef.isRefreshing = false
-                pendingFragment.setupList(it)
-            })
-            viewModel.getFailQues("fail", 10).observe(this@MainActivity, Observer {
-                binding.swipeRef.isRefreshing = false
-                binding.shimmer.stopShimmerAnimation()
-                binding.shimmer.visibility = View.GONE
-                binding.viewPagerLL.visibility = View.VISIBLE
-                failFragment.setupList(it)
-            })
-            viewModel.getPassQues("pass", 10).observe(this@MainActivity, Observer {
-                binding.swipeRef.isRefreshing = false
-                binding.shimmer.stopShimmerAnimation()
-                binding.shimmer.visibility = View.GONE
-                binding.viewPagerLL.visibility = View.VISIBLE
-                passFragment.setupList(it)
-            })
-        }
-//        viewModel.getFailQues("fail", 10)
-//        viewModel.getPendingQues("pending", 10)
-//        viewModel.getPassQues("pass", 10)
-    }
-
     private fun setListeners() {
         binding.swipeRef.setOnRefreshListener {
-            binding.swipeRef.isRefreshing = true
-            getData()
+            setupViewPager()
         }
         binding.navigationMenu.setNavigationItemSelectedListener(object :
             NavigationView.OnNavigationItemSelectedListener {
@@ -166,54 +138,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-//        viewModel.pendingQuesLiveData.observe(this, Observer {
-//            if (it is ResponseError) {
-//                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
-//                Log.d(TAG, "setObservers: ${it.msg}")
-//            } else {
-//                binding.shimmer.stopShimmerAnimation()
-//                binding.shimmer.visibility = View.GONE
-//                binding.viewPagerLL.visibility = View.VISIBLE
-//                binding.swipeRef.isRefreshing = false
-//                val success = it as Success<ArrayList<QuestionsModel>>
-//                pendingFragment.setupList(success.response)
-//                Log.d(TAG, "setObservers pending: ${success.response}")
-//            }
-//        })
-//        viewModel.failQuesLiveData.observe(this, Observer {
-//            if (it is ResponseError) {
-//                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "setObservers: ${it.msg}")
-//            } else {
-//                val success = it as Success<ArrayList<QuestionsModel>>
-//                failFragment.setupList(success.response)
-//                binding.swipeRef.isRefreshing = false
-//                binding.shimmer.stopShimmerAnimation()
-//                binding.shimmer.visibility = View.GONE
-//                binding.viewPagerLL.visibility = View.VISIBLE
-//                Log.d(TAG, "setObservers: ${success.response}")
-//            }
-//        })
-//        viewModel.passQuesLiveData.observe(this, Observer {
-//            if (it is ResponseError) {
-//                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
-//                binding.swipeRef.isRefreshing = false
-//                Log.d(TAG, "setObservers: ${it.msg}")
-//            } else {
-//                val success = it as Success<ArrayList<QuestionsModel>>
-//                passFragment.setupList(success.response)
-//                binding.swipeRef.isRefreshing = false
-//                binding.shimmer.stopShimmerAnimation()
-//                binding.shimmer.visibility = View.GONE
-//                binding.viewPagerLL.visibility = View.VISIBLE
-//                Log.d(TAG, "setObservers pass: ${success.response}")
-//            }
-//        })
-
         viewModel.updateLiveData.observe(this@MainActivity, Observer {
             if (it is Success<*>) {
                 binding.swipeRef.isRefreshing = true
-                getData()
                 Toast.makeText(this@MainActivity, it.response.toString(), Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "setObservers: ${it.response}")
             } else if (it is ResponseError) {
@@ -231,7 +158,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         backTime += 1
-        if(backTime < 2) {
+        if (backTime < 2) {
             Toast.makeText(this, "Press again to exit!", Toast.LENGTH_SHORT).show()
             lifecycleScope.launch(Dispatchers.IO) {
                 delay(2000)

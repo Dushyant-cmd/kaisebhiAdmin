@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.kaisebhiadmin.data.MainRepository
 import com.example.kaisebhiadmin.models.ReportedModel
 import com.example.kaisebhiadmin.utils.ResponseClass
@@ -18,7 +19,7 @@ class ReportViewModel(private val repo: MainRepository): ViewModel() {
 
     /**Below method will get the reported answers */
     suspend fun getReportedAnswers(): LiveData<PagingData<ReportedModel>> {
-        return repo.getReportedAnswers()
+        return repo.getReportedAnswers().cachedIn(viewModelScope)
 //        viewModelScope.launch(Dispatchers.IO) {
 //            repo.getReportedAnswers(limit)
 //        }

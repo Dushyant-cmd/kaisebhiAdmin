@@ -35,7 +35,7 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
 //            }
 //        }
         return Pager(
-            config = PagingConfig(2, maxSize = 100),
+            config = PagingConfig(pageSize = 10, maxSize = 100),
             pagingSourceFactory = { PendingPagingSource(firebaseInterface) }
         ).liveData
     }
@@ -49,7 +49,7 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
 //            }
 //        }
         return Pager(
-            config = PagingConfig(2, maxSize = 100),
+            config = PagingConfig(pageSize = 10, maxSize = 100),
             pagingSourceFactory = { FailPagingSource(firebaseInterface) }
         ).liveData
     }
@@ -63,7 +63,7 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
 //            }
 //        }
         return Pager(
-            config = PagingConfig(2, maxSize = 100),
+            config = PagingConfig(pageSize = 10, maxSize = 100),
             pagingSourceFactory = { PassPagingSource(firebaseInterface) }
         ).liveData
     }
