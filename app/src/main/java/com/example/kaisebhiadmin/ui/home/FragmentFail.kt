@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kaisebhiadmin.R
 import com.example.kaisebhiadmin.adapters.QuestionsAdapter
@@ -32,28 +33,20 @@ class FragmentFail(private val quesStatus: String) : Fragment() {
 
         viewModel = (activity as MainActivity).viewModel
         activity?.let {
-            adapter = QuestionsAdapter(list, it, viewModel,
+            adapter = QuestionsAdapter(it, viewModel,
                 it.supportFragmentManager)
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager = LinearLayoutManager(activity)
-            adapter!!.submitList(list)
+//            adapter!!.submitList(list)
         }
 //        viewModel.getQues(quesStatus, 10)
 //        setObservers()
         return binding.root
     }
 
-    fun setupList(list2: ArrayList<QuestionsModel>) {
-        this.list = list2
-        activity?.let {
-            Log.d(TAG, "setupList fail: ${list[0].qualityCheck}")
-            val viewModel = (activity as MainActivity).viewModel
-            adapter = QuestionsAdapter(list, it, viewModel,
-                it.supportFragmentManager)
-            binding.recyclerView.adapter = adapter
-            adapter!!.submitList(list)
-            adapter!!.notifyDataSetChanged()
-        }
+    fun setupList(pagingData: PagingData<QuestionsModel>) {
+        adapter?.submitData(lifecycle, pagingData)
+        Log.d(TAG, "setObservers success pending: $list")
     }
 
 }

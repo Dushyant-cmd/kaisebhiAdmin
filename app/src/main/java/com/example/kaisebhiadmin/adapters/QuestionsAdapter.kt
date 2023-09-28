@@ -7,16 +7,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kaisebhiadmin.R
 import com.example.kaisebhiadmin.databinding.BottomSheetLayoutBinding
+import com.example.kaisebhiadmin.databinding.ModalQuestionsBinding
 import com.example.kaisebhiadmin.models.QuestionsModel
 import com.example.kaisebhiadmin.ui.home.MainViewModel
 import com.google.android.exoplayer2.MediaItem
@@ -28,74 +26,70 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
 
 class QuestionsAdapter(
-    private val list: ArrayList<QuestionsModel>,
     private val ctx: Context,
     private val viewModel: MainViewModel,
     private val fm: FragmentManager
-) : ListAdapter<QuestionsModel, QuestionsAdapter.ViewHolder>(object :
-    DiffUtil.ItemCallback<QuestionsModel>() {
-    override fun areContentsTheSame(oldItem: QuestionsModel, newItem: QuestionsModel): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areItemsTheSame(oldItem: QuestionsModel, newItem: QuestionsModel): Boolean {
-        return oldItem.iD == newItem.iD
-    }
-}) {
+) : PagingDataAdapter<QuestionsModel, QuestionsAdapter.ViewHolder>(COMPARATOR) {
     private val TAG = "QuestionsAdapter.kt"
-    override fun getItemCount(): Int {
-        return list.size
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.modal_questions, parent, false)
+        val binding = DataBindingUtil.inflate<ModalQuestionsBinding>(
+            LayoutInflater.from(parent.context),
+            R.layout.modal_questions,
+            parent,
+            false
         )
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        try {
-        if (currentList.isNotEmpty()) {
-            val dataObj = getItem(position)
-            Log.d(TAG, "onBindViewHolder obj: $dataObj")
-            holder.userName.text = dataObj.uname
-            holder.desc.text = dataObj.desc
-            holder.title.text = dataObj.title
-            Log.d(TAG, "onBindViewHolder img: ${dataObj.image}")
+        val dataObj = getItem(position)
+        Log.d(TAG, "onBindViewHolder obj: $dataObj")
+        dataObj?.let {
+            holder.bind(dataObj)
+        }
+    }
+
+    inner class ViewHolder(private val binding: ModalQuestionsBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(dataObj: QuestionsModel) {
+            binding.username.text = dataObj.uname
+            binding.quesDesc.text = dataObj.desc
+            binding.quesTitle.text = dataObj.title
             val picasso = Picasso.get()
             if (dataObj.image?.contains("http") == true)
-                picasso.load(Uri.parse(dataObj.image)).into(holder.quesImg)
+                picasso.load(Uri.parse(dataObj.image)).into(binding.quesImage)
             if (dataObj.userPicUrl?.contains("http") == true)
                 picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile)
-                    .into(holder.userImage)
+                    .into(binding.userPro)
 
             Log.d(TAG, "onBindViewHolder qualityCheck: ${dataObj.qualityCheck}")
             when (dataObj.qualityCheck) {
                 "fail" -> {
-                    holder.failBtn.visibility = View.GONE
-                    holder.passBtn.visibility = View.VISIBLE
+                    binding.failBtn.visibility = View.GONE
+                    binding.passBtn.visibility = View.VISIBLE
                 }
 
                 "pass" -> {
-                    holder.passBtn.visibility = View.GONE
-                    holder.failBtn.visibility = View.VISIBLE
+                    binding.passBtn.visibility = View.GONE
+                    binding.failBtn.visibility = View.VISIBLE
                 }
 
                 "pending" -> {
-                    holder.failBtn.visibility = View.VISIBLE
-                    holder.passBtn.visibility = View.VISIBLE
+                    binding.failBtn.visibility = View.VISIBLE
+                    binding.passBtn.visibility = View.VISIBLE
                 }
             }
 
-            if(dataObj.audio.isNullOrEmpty())
-                holder.audioBtn.visibility = View.GONE
+            if (dataObj.audio.isNullOrEmpty())
+                binding.playBtn.visibility = View.GONE
 
-            holder.audioBtn.setOnClickListener {
+            binding.playBtn.setOnClickListener {
                 val sheet = PlayerBottomSheet(dataObj.audio!!)
                 sheet.show(fm, "audio")
             }
 
-            holder.passBtn.setOnClickListener {
+            binding.passBtn.setOnClickListener {
                 viewModel.updateQues(
                     dataObj.iD.toString(),
                     "pass",
@@ -104,7 +98,7 @@ class QuestionsAdapter(
                 )
             }
 
-            holder.failBtn.setOnClickListener {
+            binding.failBtn.setOnClickListener {
                 viewModel.updateQues(
                     dataObj.iD.toString(),
                     "fail",
@@ -113,12 +107,8 @@ class QuestionsAdapter(
                 )
             }
         }
-//        } catch (e: Exception) {
-//            Log.d(TAG, "onBindViewHolder: $e")
-//        }
     }
 
-    /**Below class is BottomSheetDialogFragment to display a sheet to play audio.  */
     /**Below class is BottomSheetDialogFragment to display a sheet to play audio.  */
     class PlayerBottomSheet(private val downloadUrl: String) : BottomSheetDialogFragment() {
         private var exoPlayer: com.google.android.exoplayer2.ExoPlayer? = null
@@ -130,7 +120,8 @@ class QuestionsAdapter(
             container: ViewGroup?,
             saveInstanceState: Bundle?
         ): View? {
-            binding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_layout, container, false)
+            binding =
+                DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_layout, container, false)
             initializePlayer(binding.playerView, downloadUrl)
             return binding.root
         }
@@ -142,7 +133,8 @@ class QuestionsAdapter(
         private fun initializePlayer(playerView: PlayerView, audioUrl: String) {
             try {
                 //Create ExoPlayer instance
-                exoPlayer = activity?.let { com.google.android.exoplayer2.ExoPlayer.Builder(it).build() }
+                exoPlayer =
+                    activity?.let { com.google.android.exoplayer2.ExoPlayer.Builder(it).build() }
                 //Create a MediaItem
                 val mediaItem = MediaItem.Builder()
                     .setUri(audioUrl)
@@ -180,14 +172,22 @@ class QuestionsAdapter(
         }
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val userImage = view.findViewById<ImageView>(R.id.userPro)
-        val title = view.findViewById<TextView>(R.id.quesTitle)
-        val desc = view.findViewById<TextView>(R.id.quesDesc)
-        val quesImg = view.findViewById<ImageView>(R.id.quesImage)
-        val audioBtn = view.findViewById<Button>(R.id.playBtn)
-        val passBtn = view.findViewById<Button>(R.id.passBtn)
-        val failBtn = view.findViewById<Button>(R.id.failBtn)
-        val userName = view.findViewById<TextView>(R.id.username)
+    companion object {
+        val COMPARATOR = object :
+            DiffUtil.ItemCallback<QuestionsModel>() {
+            override fun areContentsTheSame(
+                oldItem: QuestionsModel,
+                newItem: QuestionsModel
+            ): Boolean {
+                return oldItem == newItem
+            }
+
+            override fun areItemsTheSame(
+                oldItem: QuestionsModel,
+                newItem: QuestionsModel
+            ): Boolean {
+                return oldItem.iD == newItem.iD
+            }
+        }
     }
 }

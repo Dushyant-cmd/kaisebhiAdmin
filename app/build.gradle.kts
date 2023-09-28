@@ -79,4 +79,5 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.1.0@aar")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("androidx.paging:paging-runtime-ktx:3.0.0")
 }

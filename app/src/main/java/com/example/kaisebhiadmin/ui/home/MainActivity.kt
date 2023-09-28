@@ -22,7 +22,6 @@ import com.example.kaisebhiadmin.R
 import com.example.kaisebhiadmin.adapters.MainViewPagerAdapter
 import com.example.kaisebhiadmin.data.MainRepository
 import com.example.kaisebhiadmin.databinding.ActivityMainBinding
-import com.example.kaisebhiadmin.models.QuestionsModel
 import com.example.kaisebhiadmin.ui.login.SignInActivity
 import com.example.kaisebhiadmin.ui.report.ReportActivity
 import com.example.kaisebhiadmin.utils.AppCustom
@@ -95,9 +94,32 @@ class MainActivity : AppCompatActivity() {
         binding.shimmer.visibility = View.VISIBLE
         binding.viewPagerLL.visibility = View.GONE
         //Api call for all question based on filter
-        viewModel.getFailQues("fail", 10)
-        viewModel.getPendingQues("pending", 10)
-        viewModel.getPassQues("pass", 10)
+        lifecycleScope.launch {
+            viewModel.getPendingQues("pending", 10).observe(this@MainActivity, Observer {
+                binding.shimmer.stopShimmerAnimation()
+                binding.shimmer.visibility = View.GONE
+                binding.viewPagerLL.visibility = View.VISIBLE
+                binding.swipeRef.isRefreshing = false
+                pendingFragment.setupList(it)
+            })
+            viewModel.getFailQues("fail", 10).observe(this@MainActivity, Observer {
+                binding.swipeRef.isRefreshing = false
+                binding.shimmer.stopShimmerAnimation()
+                binding.shimmer.visibility = View.GONE
+                binding.viewPagerLL.visibility = View.VISIBLE
+                failFragment.setupList(it)
+            })
+            viewModel.getPassQues("pass", 10).observe(this@MainActivity, Observer {
+                binding.swipeRef.isRefreshing = false
+                binding.shimmer.stopShimmerAnimation()
+                binding.shimmer.visibility = View.GONE
+                binding.viewPagerLL.visibility = View.VISIBLE
+                passFragment.setupList(it)
+            })
+        }
+//        viewModel.getFailQues("fail", 10)
+//        viewModel.getPendingQues("pending", 10)
+//        viewModel.getPassQues("pass", 10)
     }
 
     private fun setListeners() {
@@ -144,65 +166,52 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        viewModel.pendingQuesLiveData.observe(this, Observer {
-            if (it is ResponseError) {
-                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "setObservers: ${it.msg}")
-            } else {
-                binding.shimmer.stopShimmerAnimation()
-                binding.shimmer.visibility = View.GONE
-                binding.viewPagerLL.visibility = View.VISIBLE
-                val success = it as Success<ArrayList<QuestionsModel>>
-                binding.swipeRef.isRefreshing = false
-                pendingFragment.setupList(success.response)
-                Log.d(TAG, "setObservers pending: ${success.response}")
-            }
-        })
-        viewModel.failQuesLiveData.observe(this, Observer {
-            if (it is ResponseError) {
-                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "setObservers: ${it.msg}")
-            } else {
-                val success = it as Success<ArrayList<QuestionsModel>>
-                binding.swipeRef.isRefreshing = false
-                failFragment.setupList(success.response)
-                binding.shimmer.stopShimmerAnimation()
-                binding.shimmer.visibility = View.GONE
-                binding.viewPagerLL.visibility = View.VISIBLE
-                Log.d(TAG, "setObservers: ${success.response}")
-            }
-        })
-        viewModel.passQuesLiveData.observe(this, Observer {
-            if (it is ResponseError) {
-                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
-                binding.swipeRef.isRefreshing = false
-                Log.d(TAG, "setObservers: ${it.msg}")
-            } else {
-                binding.swipeRef.isRefreshing = false
-                val success = it as Success<ArrayList<QuestionsModel>>
-                binding.swipeRef.isRefreshing = false
-                passFragment.setupList(success.response)
-                binding.shimmer.stopShimmerAnimation()
-                binding.shimmer.visibility = View.GONE
-                binding.viewPagerLL.visibility = View.VISIBLE
-                Log.d(TAG, "setObservers pass: ${success.response}")
-            }
-        })
+//        viewModel.pendingQuesLiveData.observe(this, Observer {
+//            if (it is ResponseError) {
+//                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
+//                Log.d(TAG, "setObservers: ${it.msg}")
+//            } else {
+//                binding.shimmer.stopShimmerAnimation()
+//                binding.shimmer.visibility = View.GONE
+//                binding.viewPagerLL.visibility = View.VISIBLE
+//                binding.swipeRef.isRefreshing = false
+//                val success = it as Success<ArrayList<QuestionsModel>>
+//                pendingFragment.setupList(success.response)
+//                Log.d(TAG, "setObservers pending: ${success.response}")
+//            }
+//        })
+//        viewModel.failQuesLiveData.observe(this, Observer {
+//            if (it is ResponseError) {
+//                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, "setObservers: ${it.msg}")
+//            } else {
+//                val success = it as Success<ArrayList<QuestionsModel>>
+//                failFragment.setupList(success.response)
+//                binding.swipeRef.isRefreshing = false
+//                binding.shimmer.stopShimmerAnimation()
+//                binding.shimmer.visibility = View.GONE
+//                binding.viewPagerLL.visibility = View.VISIBLE
+//                Log.d(TAG, "setObservers: ${success.response}")
+//            }
+//        })
+//        viewModel.passQuesLiveData.observe(this, Observer {
+//            if (it is ResponseError) {
+//                Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
+//                binding.swipeRef.isRefreshing = false
+//                Log.d(TAG, "setObservers: ${it.msg}")
+//            } else {
+//                val success = it as Success<ArrayList<QuestionsModel>>
+//                passFragment.setupList(success.response)
+//                binding.swipeRef.isRefreshing = false
+//                binding.shimmer.stopShimmerAnimation()
+//                binding.shimmer.visibility = View.GONE
+//                binding.viewPagerLL.visibility = View.VISIBLE
+//                Log.d(TAG, "setObservers pass: ${success.response}")
+//            }
+//        })
 
         viewModel.updateLiveData.observe(this@MainActivity, Observer {
             if (it is Success<*>) {
-//                val map = it.response as Map<*, *>
-//                when(map.get("status")) {
-//                    "fail" -> viewModel.getFailQues("fail", 10)
-//                    "pass" -> viewModel.getPassQues("pass", 10)
-//                }
-//
-//                when(map.get("qualityCheck")) {
-//                    "fail" -> viewModel.getFailQues("fail", 10)
-//                    "pass" -> viewModel.getPassQues("pass", 10)
-//                    "pending" -> viewModel.getPendingQues("pass", 10)
-//                }
-
                 binding.swipeRef.isRefreshing = true
                 getData()
                 Toast.makeText(this@MainActivity, it.response.toString(), Toast.LENGTH_SHORT).show()
