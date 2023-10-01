@@ -19,38 +19,41 @@ class PendingPagingSource(private val firebaseApiCalls: FirebaseApiCalls) :
             val apiCalls = firebaseApiCalls.getQuesApi("pending", 10, lastDoc)
             lateinit var loadResult: LoadResult<Int, QuestionsModel>
             apiCalls.addOnSuccessListener {
-                if (it.documents.size > 0)
-                    lastDoc = it.documents[it.documents.size - 1]
-                val formattedList: ArrayList<QuestionsModel> =
-                    it.documents.map { d: DocumentSnapshot ->
-                        QuestionsModel(
-                            d.getString("id"),
-                            d.getString("title"),
-                            d.getString("desc"),
-                            d.getString("qpic"),
-                            d.getString("uname"),
-                            "NA",
-                            d.getBoolean("checkFav"),
-                            d.getString("likes"),
-                            d.getBoolean("checkLike"),
-                            d.getString("tanswers"),
-                            d.getString("likedByUser"),
-                            d.getString("image") ?: "NA",
-                            d.getString("imageRef"),
-                            d.getString("userId"),
-                            d.getString("userPicUrl") ?: "NA",
-                            d.getString("portal"),
-                            d.getString("audio"),
-                            d.getString("audioRef"),
-                            d.getString("quesImgPath") ?: "NA",
-                            d.getString("qualityCheck")
-                        )
-                    } as ArrayList<QuestionsModel>
-                loadResult = LoadResult.Page(
-                    data = formattedList,
-                    prevKey = if (pos == 1) null else pos.minus(1),
-                    nextKey = if (pos == 100) null else pos.plus(1)
-                )
+                if (it.documents.size > 0) {
+                    lastDoc = it.documents[0]
+                    val formattedList: ArrayList<QuestionsModel> =
+                        it.documents.map { d: DocumentSnapshot ->
+                            QuestionsModel(
+                                d.getString("id"),
+                                d.getString("title"),
+                                d.getString("desc"),
+                                d.getString("qpic"),
+                                d.getString("uname"),
+                                "NA",
+                                d.getBoolean("checkFav"),
+                                d.getString("likes"),
+                                d.getBoolean("checkLike"),
+                                d.getString("tanswers"),
+                                d.getString("likedByUser"),
+                                d.getString("image") ?: "NA",
+                                d.getString("imageRef"),
+                                d.getString("userId"),
+                                d.getString("userPicUrl") ?: "NA",
+                                d.getString("portal"),
+                                d.getString("audio"),
+                                d.getString("audioRef"),
+                                d.getString("quesImgPath") ?: "NA",
+                                d.getString("qualityCheck")
+                            )
+                        } as ArrayList<QuestionsModel>
+                    loadResult = LoadResult.Page(
+                        data = formattedList,
+                        prevKey = if (pos == 1) null else pos.minus(1),
+                        nextKey = if (pos == 100) null else pos.plus(1)
+                    )
+                } else {
+                    loadResult = LoadResult.Error(java.lang.Exception("Data is not available"))
+                }
             }
 
             apiCalls.addOnFailureListener {
@@ -59,14 +62,6 @@ class PendingPagingSource(private val firebaseApiCalls: FirebaseApiCalls) :
 
             Tasks.whenAll(apiCalls).await()
             Log.d(TAG, "load: ${(loadResult as LoadResult.Page).data}")
-            if (!(loadResult is LoadResult.Error))
-                if ((loadResult as LoadResult.Page).data.isEmpty()) {
-                    loadResult = LoadResult.Page(
-                        data = (loadResult as LoadResult.Page<Int, QuestionsModel>).data,
-                        prevKey = if (pos == 1) null else pos.minus(1),
-                        nextKey = null
-                    )
-                }
             loadResult
         } catch (e: Exception) {
             Log.d(TAG, "load: $e")

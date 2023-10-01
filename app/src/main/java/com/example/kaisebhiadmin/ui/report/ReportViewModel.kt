@@ -20,25 +20,6 @@ class ReportViewModel(private val repo: MainRepository): ViewModel() {
     /**Below method will get the reported answers */
     suspend fun getReportedAnswers(): LiveData<PagingData<ReportedModel>> {
         return repo.getReportedAnswers().cachedIn(viewModelScope)
-//        viewModelScope.launch(Dispatchers.IO) {
-//            repo.getReportedAnswers(limit)
-//        }
-//
-//        repo.reportAnsLiveData.observeForever {res: ResponseClass ->
-//            if(res is Success<*>) {
-//                val extractRes = (res as Success<ArrayList<DocumentSnapshot>>).response
-//                    .map {
-//                        ReportedModel(it.id,
-//                            it.getString("title"),
-//                            it.getString("qdesc"),
-//                            it.getString("answer"),
-//                            it.getString("reportBy"))
-//                    }
-//
-//                reportAnsLiveData.value = Success(extractRes as ArrayList<ReportedModel>)
-//                Log.d(TAG, "getReportedAnswers: $extractRes")
-//            } else reportAnsLiveData.value = res
-//        }
     }
 
     fun deleteAnswer(docId: String) {

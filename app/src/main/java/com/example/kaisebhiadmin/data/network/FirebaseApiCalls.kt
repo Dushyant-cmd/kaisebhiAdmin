@@ -29,7 +29,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
             Log.d(TAG, "getQuesApi1 $lastDoc")
             return application.firestore.collection("questions")
                 .whereEqualTo("qualityCheck", filterBy)
-                .limit(10)
+                .limit(limit)
                 .get()
         } else {
             Log.d(TAG, "getQuesApi2 $lastDoc")
@@ -37,7 +37,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
                 .whereEqualTo("qualityCheck", filterBy)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .startAfter(lastDoc)
-                .limit(2)
+                .limit(limit)
                 .get()
         }
     }
@@ -75,7 +75,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
             }
     }
 
-    suspend fun getReportedAnswers(limit: Long): Task<QuerySnapshot> {
+    suspend fun getReportedAnswers(limit: Long, lastDoc: DocumentSnapshot?): Task<QuerySnapshot> {
 //        application.firestore.collection("answers")
 //            .whereEqualTo("userReportCheck", true).limit(limit).get()
 //            .addOnCompleteListener {
@@ -86,10 +86,20 @@ class FirebaseApiCalls(private val application: AppCustom) {
 //                    reportAnsLiveData.value = ResponseError(it.exception.toString())
 //                }
 //            }
-//        if (lastDoc == null)
+        if (lastDoc == null)
             return application.firestore.collection("answers")
-                .whereEqualTo("userReportCheck", true).limit(limit).get()
-//        else
+                .whereEqualTo("userReportCheck", true)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(limit)
+                .get()
+        else {
+            return application.firestore.collection("answers")
+                .whereEqualTo("userReportCheck", true)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .startAfter(lastDoc)
+                .limit(limit)
+                .get()
+        }
 //            return application.firestore.collection("answers")
 //                .whereEqualTo("userReportCheck", true).orderBy("timestamp", Query.Direction.DESCENDING)
 //                .startAfter(lastDoc).limit(limit).get()

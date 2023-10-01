@@ -61,6 +61,9 @@ class MainActivity : AppCompatActivity() {
         failFragment = FragmentFail("fail")
         passFragment = FragmentPass("pass")
         //setup ViewPager
+        binding.shimmer.visibility = View.VISIBLE
+        binding.viewPagerLL.visibility = View.VISIBLE
+        binding.shimmer.startShimmerAnimation()
         setupViewPager()
         setListeners()
         checkAndRequestPerm()
@@ -140,10 +143,11 @@ class MainActivity : AppCompatActivity() {
     private fun setObservers() {
         viewModel.updateLiveData.observe(this@MainActivity, Observer {
             if (it is Success<*>) {
-                binding.swipeRef.isRefreshing = true
+                setupViewPager()
                 Toast.makeText(this@MainActivity, it.response.toString(), Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "setObservers: ${it.response}")
             } else if (it is ResponseError) {
+                binding.swipeRef.isRefreshing = false
                 Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "setObservers: ${it.msg}")
             }
