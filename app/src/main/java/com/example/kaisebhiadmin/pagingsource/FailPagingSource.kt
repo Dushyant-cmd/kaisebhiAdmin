@@ -20,7 +20,7 @@ class FailPagingSource(private val firebaseApiCalls: FirebaseApiCalls) :
             lateinit var loadResult: LoadResult<Int, QuestionsModel>
             apiCalls.addOnSuccessListener {
                 if (it.documents.size > 0) {
-                    lastDoc = it.documents[0]
+                    lastDoc = it.documents[it.documents.size - 1]
                     val formattedList: ArrayList<QuestionsModel> =
                         it.documents.map { d: DocumentSnapshot ->
                             QuestionsModel(

@@ -14,12 +14,8 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 
 class FirebaseApiCalls(private val application: AppCustom) {
-    val pendingQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
-    val failQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
-    val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val adminLiveData = MutableLiveData<ResponseClass>()
     val updateLiveData = MutableLiveData<ResponseClass>()
-    val reportAnsLiveData = MutableLiveData<ResponseClass>()
     val deleteAnsLiveData = MutableLiveData<ResponseClass>()
     private val TAG = "FirebaseApi.kt"
 
@@ -29,6 +25,7 @@ class FirebaseApiCalls(private val application: AppCustom) {
             Log.d(TAG, "getQuesApi1 $lastDoc")
             return application.firestore.collection("questions")
                 .whereEqualTo("qualityCheck", filterBy)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(limit)
                 .get()
         } else {

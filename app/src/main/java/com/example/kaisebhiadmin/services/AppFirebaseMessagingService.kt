@@ -23,105 +23,79 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
     private var isForeground = false
     private var TAG = "FirebaseNotification.kt"
     override fun onMessageReceived(message: RemoteMessage) {
-        isForeground = true
-        //Create a Notification Channel because of changes from android O(8)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                packageName.toString(),
-                "notification",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            channel.description = "channel"
-
-            val notificationService =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.createNotificationChannel(channel)
-        }
-
-        var title = "You got new question on Admin"
-        var body = "Click here"
-        message.notification?.let {
-            title = it.title.toString()
-            body = it.body.toString()
-        }
-        //Crate Notification that gonna display when notification received
-        val builder = NotificationCompat.Builder(this, packageName.toString())
-            .setContentTitle(title)
-            .setContentText(body)
-            .setAutoCancel(true)
-            .setSmallIcon(R.mipmap.ic_launcher);
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-        val pendingIntent = PendingIntent.getActivity(
-            this, 59, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        builder.setContentIntent(pendingIntent)
-
-        val notificationManagerCompat = NotificationManagerCompat.from(this)
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            notificationManagerCompat.notify(101, builder.build())
-            Log.d(TAG, "onMessageReceived: $isForeground")
-            return
-        } else {
-            Toast.makeText(this, "Allow notification permission", Toast.LENGTH_SHORT).show()
+        try {
+            isForeground = true
+            message.notification?.let {
+                showNotification(it.title.toString(), it.body.toString())
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "onMessageReceived: $e")
         }
     }
 
     override fun handleIntent(intent: Intent) {
-        intent?.let {
-            if (!isForeground) {
-                //Create a Notification Channel because of changes from android O(8)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(
-                        packageName.toString(),
-                        "notification",
-                        NotificationManager.IMPORTANCE_HIGH
+        try {
+            intent.data?.let {
+                if (!isForeground) {
+                    showNotification(
+                        intent.getStringExtra("title").toString(),
+                        intent.getStringExtra("body").toString()
                     )
-                    channel.description = "channel"
-
-                    val notificationService =
-                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    notificationService.createNotificationChannel(channel)
-                }
-                var title = "You got new question on Admin"
-                var body = "Click here"
-                intent.data?.let {
-                    title = intent.getStringExtra("title").toString()
-                    body = intent.getStringExtra("body").toString()
-                }
-                //Crate Notification that gonna display when notification received
-                val builder = NotificationCompat.Builder(this, packageName.toString())
-                    .setContentTitle(title)
-                    .setContentText(body)
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.mipmap.ic_launcher);
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                val pendingIntent = PendingIntent.getActivity(
-                    this, 59, intent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-                builder.setContentIntent(pendingIntent)
-
-                val notificationManagerCompat = NotificationManagerCompat.from(this)
-                if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    if (SessionConfig(this@AppFirebaseMessagingService).getLoginStatus())
-                        notificationManagerCompat.notify(101, builder.build())
-                    Log.d(TAG, "handleIntent: ${intent.data}")
-                    return
-                } else {
-                    Toast.makeText(this, "Allow notification permission", Toast.LENGTH_SHORT).show()
                 }
             }
+        } catch (e: Exception) {
+            Log.d(TAG, "handleIntent: $e")
+        }
+    }
+
+    private fun showNotification(title: String, body: String) {
+        try {
+            //Create a Notification Channel because of changes from android O(8)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    packageName.toString(),
+                    "notification",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+                channel.description = "channel"
+
+                val notificationService =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationService.createNotificationChannel(channel)
+            }
+            //Crate Notification that gonna display when notification received
+            val builder = NotificationCompat.Builder(this, packageName.toString())
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.logo_transparent)
+                .setColor(resources.getColor(R.color.white))
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            val pendingIntent = PendingIntent.getActivity(
+                this, 59, intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            builder.setContentIntent(pendingIntent)
+
+            val notificationManagerCompat = NotificationManagerCompat.from(this)
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                if (SessionConfig(this@AppFirebaseMessagingService).getLoginStatus())
+                    notificationManagerCompat.notify(101, builder.build())
+                Log.d(TAG, "handleIntent: ${intent.data}")
+                return
+            } else {
+                Toast.makeText(this, "Allow notification permission", Toast.LENGTH_SHORT).show()
+            }
+
+            isForeground = false
+
+        } catch (e: Exception) {
+            Log.d(TAG, "showNotification: $e")
         }
     }
 
