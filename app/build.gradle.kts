@@ -63,6 +63,8 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
     //google play services
     implementation("com.google.gms:google-services:4.3.15")
@@ -77,7 +79,5 @@ dependencies {
 
     //facebook Shimmer
     implementation("com.facebook.shimmer:shimmer:0.1.0@aar")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("androidx.paging:paging-runtime-ktx:3.0.0")
 }

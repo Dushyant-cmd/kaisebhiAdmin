@@ -56,6 +56,7 @@ class QuestionsAdapter(
             binding.username.text = dataObj.uname
             binding.quesDesc.text = dataObj.desc
             binding.quesTitle.text = dataObj.title
+            binding.portalTV.text = dataObj.portal
             val picasso = Picasso.get()
             if (dataObj.image?.contains("http") == true)
                 picasso.load(Uri.parse(dataObj.image)).into(binding.quesImage)

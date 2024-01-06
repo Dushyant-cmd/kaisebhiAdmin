@@ -49,11 +49,6 @@ class FragmentPending(private val quesStatus: String) : Fragment() {
             viewModel.getPendingQues("pending", 10)
                 .observe(viewLifecycleOwner, Observer {
                     it?.let {
-//                        binding.shimmer.stopShimmerAnimation()
-//                        binding.shimmer.visibility = View.GONE
-//                        binding.viewPagerLL.visibility = View.VISIBLE
-//                        binding.swipeRef.isRefreshing = false
-//                        pendingFragment.setupList(it)
                         adapter?.submitData(lifecycle, it)
                     }
                     Log.d(TAG, "getData: $it")
