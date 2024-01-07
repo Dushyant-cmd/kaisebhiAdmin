@@ -57,12 +57,17 @@ class QuestionsAdapter(
             binding.quesDesc.text = dataObj.desc
             binding.quesTitle.text = dataObj.title
             binding.portalTV.text = dataObj.portal
-            val picasso = Picasso.get()
-            if (dataObj.image?.contains("http") == true)
-                picasso.load(Uri.parse(dataObj.image)).into(binding.quesImage)
-            if (dataObj.userPicUrl?.contains("http") == true)
-                picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile)
-                    .into(binding.userPro)
+
+            if(dataObj.image.isNullOrEmpty())
+                binding.quesImage.visibility = View.GONE
+            else {
+                val picasso = Picasso.get()
+                if (dataObj.image?.contains("http") == true)
+                    picasso.load(Uri.parse(dataObj.image)).into(binding.quesImage)
+                if (dataObj.userPicUrl?.contains("http") == true)
+                    picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile)
+                        .into(binding.userPro)
+            }
 
             Log.d(TAG, "onBindViewHolder qualityCheck: ${dataObj.qualityCheck}")
             when (dataObj.qualityCheck) {
