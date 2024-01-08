@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -15,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.kaisebhiadmin.R
@@ -27,7 +25,6 @@ import com.example.kaisebhiadmin.ui.report.ReportActivity
 import com.example.kaisebhiadmin.utils.AppCustom
 import com.example.kaisebhiadmin.utils.ResponseError
 import com.example.kaisebhiadmin.utils.Success
-import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,8 +44,7 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
         application = getApplication() as AppCustom
         viewModel = ViewModelProvider(
-            this@MainActivity,
-            MainViewModelFactory(MainRepository(application.firebaseApiClass))
+            this@MainActivity, MainViewModelFactory(MainRepository(application.firebaseApiClass))
         )[MainViewModel::class.java]
         binding.viewModel = viewModel
         //Setup Navigation Drawer make toggle and sync state with drawer then
@@ -84,78 +80,71 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAndRequestPerm() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_DENIED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    101
-                )
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101
+            )
+        }
     }
 
     private fun setListeners() {
         binding.swipeRef.setOnRefreshListener {
             setupViewPager()
         }
-        binding.navigationMenu.setNavigationItemSelectedListener(object :
-            NavigationView.OnNavigationItemSelectedListener {
-            override fun onNavigationItemSelected(item: MenuItem): Boolean {
-                return when (item.itemId) {
-                    R.id.reportAns -> {
-                        startActivity(Intent(this@MainActivity, ReportActivity::class.java))
-                        true
-                    }
+        binding.navigationMenu.setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.reportAns -> {
+                    startActivity(Intent(this@MainActivity, ReportActivity::class.java))
+                    true
+                }
 
-                    R.id.allQues -> {
-                        binding.drawerLayout.close()
-                        true
-                    }
+                R.id.allQues -> {
+                    binding.drawerLayout.close()
+                    true
+                }
 
-                    R.id.logOut -> {
-                        val dialog = AlertDialog.Builder(this@MainActivity)
-                        dialog.setMessage("Are you sure to log-out")
-                        dialog.setPositiveButton(
-                            "Yes"
-                        ) { p0, p1 -> logOut() }
+                R.id.logOut -> {
+                    val dialog = AlertDialog.Builder(this@MainActivity)
+                    dialog.setMessage("Are you sure to log-out")
+                    dialog.setPositiveButton(
+                        "Yes"
+                    ) { _, _ -> logOut() }
 
-                        dialog.setNegativeButton(
-                            "No"
-                        ) { dialogInterface, p1 ->
-                            //cancel
-                        }
-                        dialog.show()
-                        true
+                    dialog.setNegativeButton(
+                        "No"
+                    ) { _, _ ->
+                        //cancel
                     }
+                    dialog.show()
+                    true
+                }
 
-                    else -> {
-                        true
-                    }
+                else -> {
+                    true
                 }
             }
-        })
+        }
     }
 
     private fun setObservers() {
-        viewModel.updateLiveData.observe(this@MainActivity, Observer {
+        viewModel.updateLiveData.observe(this@MainActivity) {
             if (it is Success<*>) {
                 setupViewPager()
-                Toast.makeText(this@MainActivity, it.response.toString(), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "success", Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "setObservers: ${it.response}")
             } else if (it is ResponseError) {
                 binding.swipeRef.isRefreshing = false
                 Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "setObservers: ${it.msg}")
             }
-        })
+        }
     }
 
     /**Below method will log-out user from app */
-    fun logOut() {
+    private fun logOut() {
         application.sessionConfig.clear()
         startActivity(Intent(this, SignInActivity::class.java))
     }
