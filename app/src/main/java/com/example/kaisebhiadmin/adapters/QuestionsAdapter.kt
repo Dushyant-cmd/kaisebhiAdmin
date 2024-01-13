@@ -17,6 +17,7 @@ import com.example.kaisebhiadmin.databinding.BottomSheetLayoutBinding
 import com.example.kaisebhiadmin.databinding.ModalQuestionsBinding
 import com.example.kaisebhiadmin.models.QuestionsModel
 import com.example.kaisebhiadmin.ui.home.MainViewModel
+import com.example.kaisebhiadmin.utils.QuestionClickListener
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
@@ -31,7 +32,7 @@ class QuestionsAdapter(
     private val fm: FragmentManager
 ) : PagingDataAdapter<QuestionsModel, QuestionsAdapter.ViewHolder>(COMPARATOR) {
     private val TAG = "QuestionsAdapter.kt"
-
+    private lateinit var clickListener: QuestionClickListener
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = DataBindingUtil.inflate<ModalQuestionsBinding>(
             LayoutInflater.from(parent.context),
@@ -67,6 +68,10 @@ class QuestionsAdapter(
                 if (dataObj.userPicUrl?.contains("http") == true)
                     picasso.load(dataObj.userPicUrl).placeholder(R.drawable.profile)
                         .into(binding.userPro)
+            }
+
+            binding.quesImage.setOnClickListener{
+                clickListener.onClick(dataObj.image)
             }
 
             Log.d(TAG, "onBindViewHolder qualityCheck: ${dataObj.qualityCheck}")
@@ -115,6 +120,9 @@ class QuestionsAdapter(
         }
     }
 
+    fun addClickListener(clickListener: QuestionClickListener) {
+        this.clickListener = clickListener
+    }
     /**Below class is BottomSheetDialogFragment to display a sheet to play audio.  */
     class PlayerBottomSheet(private val downloadUrl: String) : BottomSheetDialogFragment() {
         private var exoPlayer: com.google.android.exoplayer2.ExoPlayer? = null

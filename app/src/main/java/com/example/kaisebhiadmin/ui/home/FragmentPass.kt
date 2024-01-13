@@ -1,5 +1,6 @@
 package com.example.kaisebhiadmin.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kaisebhiadmin.R
 import com.example.kaisebhiadmin.adapters.QuestionsAdapter
 import com.example.kaisebhiadmin.databinding.FragmentPassBinding
+import com.example.kaisebhiadmin.utils.QuestionClickListener
 import kotlinx.coroutines.launch
 
 class FragmentPass(private val quesStatus: String) : Fragment() {
@@ -30,6 +32,18 @@ class FragmentPass(private val quesStatus: String) : Fragment() {
                 it.supportFragmentManager)
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+
+            adapter!!.addClickListener(object: QuestionClickListener {
+                override fun onClick(picUrl: String?) {
+                    activity?.let { activity ->
+                        val intent = Intent(activity, ViewPicActivity::class.java)
+                        val bundle = Bundle()
+                        bundle.putString("picUrl", picUrl)
+                        intent.putExtra("bundle", bundle)
+                        startActivity(intent)
+                    }
+                }
+            })
         }
 
         setupList()
@@ -42,11 +56,6 @@ class FragmentPass(private val quesStatus: String) : Fragment() {
         viewModel.getPassQues("pass", 10)
             .observe(viewLifecycleOwner, Observer {
                 it?.let {
-//                    binding.swipeRef.isRefreshing = false
-//                    binding.shimmer.stopShimmerAnimation()
-//                    binding.shimmer.visibility = View.GONE
-//                    binding.viewPagerLL.visibility = View.VISIBLE
-//                    passFragment.setupList(it)
                     adapter?.submitData(lifecycle, it)
                 }
                 Log.d(TAG, "getData: $it")

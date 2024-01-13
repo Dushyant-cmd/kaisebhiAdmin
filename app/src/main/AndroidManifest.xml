@@ -39,6 +39,8 @@
             android:name=".ui.home.MainActivity"
             android:exported="false" />
 
+        <activity android:name=".ui.home.ViewPicActivity"
+            android:exported="false"/>
         <service
             android:name=".services.AppFirebaseMessagingService"
             android:exported="false">

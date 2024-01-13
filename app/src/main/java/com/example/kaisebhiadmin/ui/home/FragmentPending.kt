@@ -1,5 +1,6 @@
 package com.example.kaisebhiadmin.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import com.example.kaisebhiadmin.R
 import com.example.kaisebhiadmin.adapters.QuestionsAdapter
 import com.example.kaisebhiadmin.databinding.FragmentPendingBinding
 import com.example.kaisebhiadmin.models.QuestionsModel
+import com.example.kaisebhiadmin.utils.QuestionClickListener
 import kotlinx.coroutines.launch
 
 class FragmentPending(private val quesStatus: String) : Fragment() {
@@ -38,6 +40,18 @@ class FragmentPending(private val quesStatus: String) : Fragment() {
             )
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+
+            adapter!!.addClickListener(object: QuestionClickListener {
+                override fun onClick(picUrl: String?) {
+                    activity?.let { activity ->
+                        val intent = Intent(activity, ViewPicActivity::class.java)
+                        val bundle = Bundle()
+                        bundle.putString("picUrl", picUrl)
+                        intent.putExtra("bundle", bundle)
+                        startActivity(intent)
+                    }
+                }
+            })
         }
         Log.d(TAG, "onCreateView: pending $adapter")
         setupList()

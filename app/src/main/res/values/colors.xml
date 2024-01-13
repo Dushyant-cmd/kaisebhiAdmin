@@ -12,4 +12,5 @@
     <color name="greyColor">#5C5C5C</color>
     <color name="orangeLight">#ffffbb33</color>
     <color name="orangeDark">#ffff8800</color>
+    <color name="pastel_green">#32C732</color>
 </resources>
