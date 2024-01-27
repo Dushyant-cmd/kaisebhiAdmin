@@ -11,7 +11,6 @@ import kotlinx.coroutines.tasks.await
 
 class ReportPagingSource(private val firebase: FirebaseApiCalls) :
     PagingSource<Int, ReportedModel>() {
-//    private var lastDoc: DocumentSnapshot? = null
     private val TAG = "ReportPagingSource.kt"
     private var lastDoc: DocumentSnapshot? = null
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ReportedModel> {

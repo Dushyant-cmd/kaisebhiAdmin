@@ -18,22 +18,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
-    val pendingQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
-    val failQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
-    val passQuesLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val adminLiveData: MutableLiveData<ResponseClass> = MutableLiveData()
     val updateLivedata = MutableLiveData<ResponseClass>()
-    val reportAnsLiveData = MutableLiveData<ResponseClass>()
     val deleteAnsLiveData = MutableLiveData<ResponseClass>()
+    val withdrawLiveData = MutableLiveData<ResponseClass>()
 
     /**Below method get pending questions */
     suspend fun getPendingQues(filterBy: String, limit: Long): LiveData<PagingData<QuestionsModel>> {
-//        firebaseInterface.getQuesApi(filterBy, limit)
-//        withContext(Dispatchers.Main) {
-//            firebaseInterface.pendingQuesLiveData.observeForever {
-//                pendingQuesLiveData.value = it
-//            }
-//        }
         return Pager(
             config = PagingConfig(pageSize = 10, maxSize = 100),
             pagingSourceFactory = { PendingPagingSource(firebaseInterface) }
@@ -42,12 +33,6 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
 
     /**Below method get fail questions */
     suspend fun getFailQues(filterBy: String, limit: Long): LiveData<PagingData<QuestionsModel>> {
-//        firebaseInterface.getQuesApi(filterBy, limit)
-//        withContext(Dispatchers.Main) {
-//            firebaseInterface.failQuesLiveData.observeForever {
-//                failQuesLiveData.value = it
-//            }
-//        }
         return Pager(
             config = PagingConfig(pageSize = 10, maxSize = 100),
             pagingSourceFactory = { FailPagingSource(firebaseInterface) }
@@ -56,12 +41,6 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
 
     /**Below method get pass questions */
     suspend fun getPassQues(filterBy: String, limit: Long): LiveData<PagingData<QuestionsModel>> {
-//        firebaseInterface.getQuesApi(filterBy, limit)
-//        withContext(Dispatchers.Main) {
-//            firebaseInterface.passQuesLiveData.observeForever {
-//                passQuesLiveData.value = it
-//            }
-//        }
         return Pager(
             config = PagingConfig(pageSize = 10, maxSize = 100),
             pagingSourceFactory = { PassPagingSource(firebaseInterface) }
@@ -90,12 +69,6 @@ class MainRepository(private val firebaseInterface: FirebaseApiCalls) {
 
     /**Below method to get all the reported answers */
     suspend fun getReportedAnswers(): LiveData<PagingData<ReportedModel>> {
-//        firebaseInterface.getReportedAnswers(limit)
-//        withContext(Dispatchers.Main) {
-//            firebaseInterface.reportAnsLiveData.observeForever {
-//                reportAnsLiveData.value = it
-//            }
-//        }
         return Pager(
             config = PagingConfig(pageSize = 2, maxSize = 100),
             pagingSourceFactory = { ReportPagingSource(firebaseInterface) }

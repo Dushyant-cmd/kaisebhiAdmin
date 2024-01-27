@@ -19,9 +19,13 @@ class FirebaseApiCalls(private val application: AppCustom) {
     val deleteAnsLiveData = MutableLiveData<ResponseClass>()
     private val TAG = "FirebaseApi.kt"
 
-    suspend fun getQuesApi(filterBy: String, limit: Long, lastDoc: DocumentSnapshot?): Task<QuerySnapshot>{
+    suspend fun getQuesApi(
+        filterBy: String,
+        limit: Long,
+        lastDoc: DocumentSnapshot?
+    ): Task<QuerySnapshot> {
         Log.d(TAG, "getQuesApi filter by: $filterBy")
-        if(lastDoc == null) {
+        if (lastDoc == null) {
             Log.d(TAG, "getQuesApi1 $lastDoc")
             return application.firestore.collection("questions")
                 .whereEqualTo("qualityCheck", filterBy)
@@ -73,34 +77,20 @@ class FirebaseApiCalls(private val application: AppCustom) {
     }
 
     suspend fun getReportedAnswers(limit: Long, lastDoc: DocumentSnapshot?): Task<QuerySnapshot> {
-//        application.firestore.collection("answers")
-//            .whereEqualTo("userReportCheck", true).limit(limit).get()
-//            .addOnCompleteListener {
-//                if (it.isSuccessful) {
-//                    reportAnsLiveData.value =
-//                        Success<ArrayList<DocumentSnapshot>>(it.result.documents as ArrayList<DocumentSnapshot>)
-//                } else {
-//                    reportAnsLiveData.value = ResponseError(it.exception.toString())
-//                }
-//            }
-        if (lastDoc == null)
-            return application.firestore.collection("answers")
+        return if (lastDoc == null)
+            application.firestore.collection("answers")
                 .whereEqualTo("userReportCheck", true)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(limit)
                 .get()
         else {
-            return application.firestore.collection("answers")
+            application.firestore.collection("answers")
                 .whereEqualTo("userReportCheck", true)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .startAfter(lastDoc)
                 .limit(limit)
                 .get()
         }
-//            return application.firestore.collection("answers")
-//                .whereEqualTo("userReportCheck", true).orderBy("timestamp", Query.Direction.DESCENDING)
-//                .startAfter(lastDoc).limit(limit).get()
-
     }
 
     suspend fun deleteAnswer(docId: String) {
@@ -120,4 +110,21 @@ class FirebaseApiCalls(private val application: AppCustom) {
                 Log.d(TAG, "setObservers: ${it.result}")
             }
     }
+
+    fun getWithdrawal(lastDoc: DocumentSnapshot, limit: Long): Task<QuerySnapshot> {
+        return if (lastDoc == null) {
+             application.firestore.collection("rewardHistory")
+                .whereEqualTo("type", "withdraw")
+                .limit(limit)
+                .get()
+        } else {
+             application.firestore.collection("rewardHistory")
+                .whereEqualTo("type", "withdraw")
+                .startAfter(lastDoc)
+                .limit(limit)
+                .get()
+        }
+    }
+
+
 }
